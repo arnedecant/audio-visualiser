@@ -174,13 +174,13 @@ class App {
 			
             let index = i * 4
             let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
-			let threshold = 300
+			let threshold = 200
 			
             if (gray < threshold) {
-				if (gray < threshold / 3) particle.z = 1000
-				else if (gray < threshold / 2) particle.z = 100
-				else particle.z = 10
-				// particle.z = gray * 50
+				// if (gray < threshold / 3) particle.z = 1000
+				// else if (gray < threshold / 2) particle.z = 100
+				// else particle.z = 10
+				particle.z = gray * 2
             } else {
                 particle.z = 10000
             }
