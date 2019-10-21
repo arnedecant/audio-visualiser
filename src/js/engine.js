@@ -11,16 +11,6 @@ export default class Engine {
 		// set properties
 
 		this.config = config
-
-		if (!this.config.camera) this.config.camera = {
-			zpf: 5, // zoom per frame
-			default: { x: 0, y: -50, z: 5 },
-			min: { x: 0, y: -500, z: 0 },
-			max: { x: 0, y: -25, z: 1000 }
-		}
-
-		if (!this.config.zoom) this.config.zoom = 1
-		if (!this.config.scrollSpeed) this.config.scrollSpeed = 0
 		
 		this.mouse = new THREE.Vector2()
 		this.raycaster = new THREE.Raycaster()
@@ -53,6 +43,9 @@ export default class Engine {
 	}
 
 	createScene() {
+
+		this.$canvas = document.createElement('canvas')
+		this.ctx = this.$canvas.getContext('2d')
 
 		// set width & height
 
@@ -100,9 +93,9 @@ export default class Engine {
 		// set values to init the camera
 
 		this.aspectRatio = this.width / this.height
-		this.fieldOfView = 60
-		this.nearPlane = 1
-		this.farPlane = 1000
+		this.fieldOfView = 45
+		this.nearPlane = 0.1
+		this.farPlane = 10000
 
 		// create a new camera
 
@@ -113,31 +106,12 @@ export default class Engine {
 			this.farPlane
 		)
 
-		// set camera position
-
-		for (let axis of ['x','y','z']) this.camera.position[axis] = this.config.camera.default[axis]
+		const z = Math.min(window.innerWidth, window.innerHeight);
+		this.camera.position.set(0, 0, z);
 
 		// point the camera to the center
 
 		this.camera.lookAt(new THREE.Vector3(0,0,0))
-
-		// enable orbit controls
-
-		// this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
-		// this.controls.minPolarAngle = Math.PI/2
-		// this.controls.maxPolarAngle = Math.PI/2
-		// this.controls.minAzimuthAngle = 0
-  		// this.controls.maxAzimuthAngle = 0
-
-		// this.controls = new THREE.TrackballControls(this.camera, this.renderer.domElement)
-
-		// this.controls.rotateSpeed = 1.0
-		// this.controls.zoomSpeed = 1.2
-		// this.controls.panSpeed = 0.8
-		// this.controls.noZoom = false
-		// this.controls.noPan = false
-		// this.controls.staticMoving = true
-		// this.controls.dynamicDampingFactor = 0.3
 
 	}
 
