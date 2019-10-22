@@ -142,39 +142,20 @@ class App {
 
 	draw(imageData) {
 
-		// for (let i = 0, length = this.particles.geometry.vertices.length; i < length; i++) {
-		// 	const particle = this.particles.geometry.vertices[i]
-		// 	let index = i * 4
+		const spread = 2
+		const threshold = 200
 
-		// 	// Take an average of RGB and make it a gray value.
-		// 	let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
-
-		// 	let threshold = 200
-		// 	if (gray < threshold) {
-		// 		// Apply the value to Z coordinate if the value of the target pixel is less than threshold.
-		// 		particle.z = gray * 50
-		// 	} else {
-		// 		// If the value is greater than threshold, make it big value.
-		// 		particle.z = 10000
-		// 	}
-		// }
-
-		// this.particles.geometry.verticesNeedUpdate = true
-
-		const density = 2
-		
-        for (let i = 0, length = this.particles.geometry.vertices.length; i < length; i++) {
-
-			const particle = this.particles.geometry.vertices[i]
+		for (const [i, particle] of this.particles.geometry.vertices.entries()) {
 			
-            if (i % density !== 0) {
+			if (i % spread !== 0) {
                 particle.z = 10000
                 continue
 			}
+
+			// Take an average of RGB and make it a gray value.
 			
             let index = i * 4
             let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
-			let threshold = 200
 			
             if (gray < threshold) {
 				// if (gray < threshold / 3) particle.z = 1000
@@ -183,10 +164,19 @@ class App {
 				particle.z = gray * 2
             } else {
                 particle.z = 10000
-            }
+			}
+
+			// this.particles.geometry.colors[i] = new THREE.Color(1, 0, 0)
+			
+			// if (gray < threshold / 3) this.particles.geometry.colors[i] = new THREE.Color(1, 0, 0)
+			// else if (gray < threshold / 2) this.particles.geometry.colors[i] = 0x00FF00
+			// else this.particles.geometry.colors[i] = 0x0000FF
+
 		}
 		
-        this.particles.geometry.verticesNeedUpdate = true;
+		this.particles.geometry.colorsNeedUpdate = true
+        this.particles.geometry.verticesNeedUpdate = true
+            
 
 	}
 
