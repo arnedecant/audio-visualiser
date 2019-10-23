@@ -1,9 +1,9 @@
 {
-	"production": false,
+	"production": true,
 	"targets": [
 		{
 			"id": "index",
-			"seo-title": "The Pyramid",
+			"seo-title": "Webcam audio visualizer",
 			"seo-description": "",
 			"src-html": "index.html",
 			"src-sass": "main.scss",

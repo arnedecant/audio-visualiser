@@ -3,27 +3,41 @@
 // -------------------------------------------------------------------
 
 import * as THREE from 'three'
-import Engine from './Engine.js';
+import Engine from './Engine.js'
 
 class App {
 
 	constructor() {
 
-		// DOM
+		// elements
 
 		this.$video = document.querySelector('#video')
 		this.$canvas = document.createElement('canvas')
 
-		// document.body.appendChild(this.$canvas)
-
-		// Properties
+		// properties
 
 		this.cache = {}
 		this.ctx = this.$canvas.getContext("2d")
+		this.fftSize = 2048
+		this.frequencyRange = {
+			bass: [20, 140],
+			lowMid: [140, 400],
+			mid: [400, 2600],
+			highMid: [2600, 5200],
+			treble: [5200, 14000]
+		}
+		this.uniforms = {
+			time: { type: 'f', value: 0.0 },
+			size: { type: 'f', value: 10.0 }
+		}
 
 		// create new engine: setup scene, camera & lighting
 
 		window.ENGINE = new Engine()
+
+		// events
+
+		document.body.addEventListener('click', this.click.bind(this))
 
 		// init
 
@@ -32,6 +46,10 @@ class App {
 	}
 
 	init() {
+
+		// load audio
+
+		this.initAudio()
 
 		// load webcam stream
 
@@ -43,9 +61,12 @@ class App {
 
 	}
 
-	initThree() {
+	click(e) {
 
-		
+		if (!this.audio) return
+
+		if (this.audio.isPlaying) this.audio.pause()
+		else this.audio.play()
 
 	}
 
@@ -60,6 +81,24 @@ class App {
 			this.$video.srcObject = stream
 			this.$video.addEventListener("loadeddata", (e) => this.createParticles(e))
 		}, (error) => console.log(error))
+
+	}
+
+	initAudio() {
+
+		const audioListener = new THREE.AudioListener()
+		this.audio = new THREE.Audio(audioListener)
+
+		const audioLoader = new THREE.AudioLoader()
+
+		audioLoader.load('assets/two.mp3', (buffer) => {
+			this.audio.setBuffer(buffer)
+			this.audio.setLoop(true)
+			this.audio.play()
+		})
+
+		const fftSize = 2048
+		this.analyser = new THREE.AudioAnalyser(this.audio, fftSize)
 
 	}
 
@@ -97,6 +136,7 @@ class App {
 
 		const geometry = new THREE.Geometry()
 		const material = new THREE.PointsMaterial({ size: 1, color: 0xff3b6c, sizeAttenuation: false })
+
 
 		// This is necessary to avoid error
 
@@ -145,6 +185,32 @@ class App {
 		const spread = 2
 		const threshold = 200
 
+		let rgb = {}
+
+		// Analyse audio frequency data
+
+		// if (this.analyser) {
+
+		// 	// analyser.getFrequencyData() would be an array with a size of half of fftSize.
+		// 	const data = analyser.getFrequencyData()
+				
+		// 	const bass = getFrequencyRangeValue(data, frequencyRange.bass)
+		// 	const mid = getFrequencyRangeValue(data, frequencyRange.mid)
+		// 	const treble = getFrequencyRangeValue(data, frequencyRange.treble)
+
+		// 	rgb = {
+		// 		r: bass,
+		// 		g: mid,
+		// 		b: treble
+		// 	}
+
+		// }
+
+		const data = this.analyser.getFrequencyData()
+    	let averageFreq = this.analyser.getAverageFrequency()
+
+		// Loop and update particles
+
 		for (const [i, particle] of this.particles.geometry.vertices.entries()) {
 			
 			if (i % spread !== 0) {
@@ -161,7 +227,10 @@ class App {
 				// if (gray < threshold / 3) particle.z = 1000
 				// else if (gray < threshold / 2) particle.z = 100
 				// else particle.z = 10
-				particle.z = gray * 2
+				particle.z = gray * 2 * (averageFreq / 255)
+				// if (gray < threshold / 3) this.particles.geometry.attributes.position.array[i + 2] = gray * r * 5
+				// else if (gray < threshold / 2) this.particles.geometry.attributes.position.array[i + 2] = gray * g * 5
+				// else this.particles.geometry.attributes.position.array[i + 2] = gray * b * 5
             } else {
                 particle.z = 10000
 			}
@@ -174,7 +243,7 @@ class App {
 
 		}
 		
-		this.particles.geometry.colorsNeedUpdate = true
+		// this.particles.geometry.colorsNeedUpdate = true
         this.particles.geometry.verticesNeedUpdate = true
             
 
