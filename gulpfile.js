@@ -165,7 +165,11 @@ gulp.task('copy', () => {
 		.pipe(plugins.plumber())
 		.pipe(gulp.dest('public/assets'))
 
-	return merge([fonts, vendor, assets])
+	let shaders = gulp.src('src/shaders/**')
+		.pipe(plugins.plumber())
+		.pipe(gulp.dest('public/shaders'))
+
+	return merge([fonts, vendor, assets, shaders])
 
 })
 

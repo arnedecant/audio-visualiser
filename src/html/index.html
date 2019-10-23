@@ -131,6 +131,15 @@
 	@@include('icons/icons.html')
 
 
+	<!-- SHADERS /////////////////////////////////////////////////// -->
+
+	<script type="x-shader/x-fragment" data-shader="fragment">
+		@@include('../shaders/shader.frag')
+	</script>
+	<script type="x-shader/x-vertex" data-shader="vertex">
+		@@include('../shaders/shader.vert')
+	</script>
+
 	<!-- SCRIPTS /////////////////////////////////////////////////////
 	For 3rd party libraries we're better off using a CDN,
 	providing we have a local fallback in place

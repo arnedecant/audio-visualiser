@@ -4,6 +4,8 @@
 
 import * as THREE from 'three'
 import Engine from './Engine.js'
+import { hexToRgb } from './utilities/colors.js'
+import { getFrequencyRangeValue } from './utilities/audio.js'
 
 class App {
 
@@ -16,6 +18,10 @@ class App {
 
 		// properties
 
+		this.shaders = {
+			vertex: document.querySelector('[data-shader="vertex"]').textContent,
+			fragment: document.querySelector('[data-shader="fragment"]').textContent
+		}
 		this.cache = {}
 		this.ctx = this.$canvas.getContext("2d")
 		this.fftSize = 2048
@@ -30,6 +36,8 @@ class App {
 			time: { type: 'f', value: 0.0 },
 			size: { type: 'f', value: 10.0 }
 		}
+		this.indices = [] // store every index for each particle
+		this.particles = []
 
 		// create new engine: setup scene, camera & lighting
 
@@ -91,18 +99,19 @@ class App {
 
 		const audioLoader = new THREE.AudioLoader()
 
-		audioLoader.load('assets/two.mp3', (buffer) => {
+		audioLoader.load('assets/one.mp3', (buffer) => {
 			this.audio.setBuffer(buffer)
 			this.audio.setLoop(true)
 			this.audio.play()
 		})
 
-		const fftSize = 2048
-		this.analyser = new THREE.AudioAnalyser(this.audio, fftSize)
+		this.analyser = new THREE.AudioAnalyser(this.audio, this.fftSize)
 
 	}
 
 	getImageData(image = this.$video, useCache = false) {
+
+		if (useCache) return this.cache.image
 
 		const w = image.videoWidth
 		const h = image.videoHeight
@@ -129,41 +138,71 @@ class App {
 	}
 
 	createParticles() {
-
+		
 		const imageData = this.getImageData()
 
-		if (!imageData) setTimeout(() => this.createParticles(), 100)
+		// if (!imageData) setTimeout(() => this.createParticles(), 100)
 
-		const geometry = new THREE.Geometry()
-		const material = new THREE.PointsMaterial({ size: 1, color: 0xff3b6c, sizeAttenuation: false })
+		const geometry = new THREE.BufferGeometry()
+		// const material = new THREE.PointsMaterial({ size: 1, color: 0xff3b6c, sizeAttenuation: false })
+		const material = new THREE.ShaderMaterial({
+			uniforms: this.uniforms,
+			vertexShader: this.shaders.vertex,
+			fragmentShader: this.shaders.fragment,
+			transparent: true,
+			depthWrite: false,
+			blending: THREE.AdditiveBlending
+		})
 
+		const vertices = []
+		const colors = []
+		let colorsPerFace = ['#ff4b78', '#16e36d', '#162cf8', '#2016e3']
 
 		// This is necessary to avoid error
-
-		geometry.morphAttributes = {}
+		// geometry.morphAttributes = {}
 
 		// Push vertices
 
-		for (let y = 0, height = imageData.height; y < height; y += 1) {
-			for (let x = 0, width = imageData.width; x < width; x += 1) {
+		const step = 3
+
+		for (let y = 0, height = imageData.height; y < height; y += step) {
+			for (let x = 0, width = imageData.width; x < width; x += step) {
+
+				let index = (x + y * width) * 4
+				this.indices.push(index)
+
+				const data = imageData.data
+				const gray = (data[index] + data[index + 1] + data[index + 2]) / 3
 
 				const vX = x - imageData.width / 2  	// Shift in X direction since origin is center of screen
-        		const vY = -y + imageData.height / 2 	// Shift in Y direction in the same way (you need -y)
+				const vY = -y + imageData.height / 2 	// Shift in Y direction in the same way (you need -y)
+				const vZ = gray < 300 ? gray : 10000
 
-				const vertex = new THREE.Vector3(vX, vY, 0)
-				geometry.vertices.push(vertex)
+				// const vertex = new THREE.Vector3(vX, vY, vZ)
+				// geometry.vertices.push(vertex)
+				
+				vertices.push(vX, vY, vZ)
+
+				const color = hexToRgb(colorsPerFace[Math.floor(Math.random() * colorsPerFace.length)])
+            	colors.push(color.r, color.g, color.b)
 
 			}
 		}
 
 		// Add particles to scene
 
+		const verticesArray = new Float32Array(vertices)
+		geometry.addAttribute('position', new THREE.BufferAttribute(verticesArray, 3))
+	
+		const colorsArray = new Float32Array(colors)
+		geometry.addAttribute('color', new THREE.BufferAttribute(colorsArray, 3))
+
 		this.particles = new THREE.Points(geometry, material)
 		ENGINE.scene.add(this.particles)
 
 	}
 
-	render() {
+	render(timestamp) {
 
         // render ENGINE
 
@@ -171,8 +210,9 @@ class App {
 		
 		// Do stuff
 
-		const imageData = this.getImageData()
-		if (imageData) this.draw(imageData)
+		const useCache = timestamp % 2 === 0 
+		const imageData = this.getImageData(this.$video, useCache)
+		if (imageData) this.draw(imageData, timestamp)
 
 		// add self to the requestAnimationFrame
 
@@ -182,69 +222,72 @@ class App {
 
 	draw(imageData) {
 
-		const spread = 2
-		const threshold = 200
+		this.uniforms.time.value += 0.5
+
+		// const spread = 2
+		const threshold = 300
 
 		let rgb = {}
 
 		// Analyse audio frequency data
 
-		// if (this.analyser) {
+		if (this.analyser) {
 
-		// 	// analyser.getFrequencyData() would be an array with a size of half of fftSize.
-		// 	const data = analyser.getFrequencyData()
+			// analyser.getFrequencyData() would be an array with a size of half of fftSize.
+			const data = this.analyser.getFrequencyData()
 				
-		// 	const bass = getFrequencyRangeValue(data, frequencyRange.bass)
-		// 	const mid = getFrequencyRangeValue(data, frequencyRange.mid)
-		// 	const treble = getFrequencyRangeValue(data, frequencyRange.treble)
+			const bass = getFrequencyRangeValue(data, this.frequencyRange.bass)
+			const mid = getFrequencyRangeValue(data, this.frequencyRange.mid)
+			const treble = getFrequencyRangeValue(data, this.frequencyRange.treble)
 
-		// 	rgb = {
-		// 		r: bass,
-		// 		g: mid,
-		// 		b: treble
-		// 	}
+			rgb = {
+				r: bass,
+				g: mid,
+				b: treble
+			}
 
-		// }
+		}
 
-		const data = this.analyser.getFrequencyData()
-    	let averageFreq = this.analyser.getAverageFrequency()
+		let averageFreq = this.analyser.getAverageFrequency()
+		let count = 0
 
 		// Loop and update particles
 
-		for (const [i, particle] of this.particles.geometry.vertices.entries()) {
+		// for (let [i, particle] of this.particles.geometry.vertices.entries()) {
+		for (let i = 0; i < this.particles.geometry.attributes.position.array.length; i += 3) {
 			
-			if (i % spread !== 0) {
-                particle.z = 10000
-                continue
-			}
+			// if (i % (spread * 3) !== 0) {
+            //     this.particles.geometry.attributes.position.array[i + 2] = 10000
+            //     continue
+			// }
 
 			// Take an average of RGB and make it a gray value.
 			
-            let index = i * 4
+			// let index = i * 4
+			let index = this.indices[count]
             let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
 			
             if (gray < threshold) {
 				// if (gray < threshold / 3) particle.z = 1000
 				// else if (gray < threshold / 2) particle.z = 100
 				// else particle.z = 10
-				particle.z = gray * 2 * (averageFreq / 255)
-				// if (gray < threshold / 3) this.particles.geometry.attributes.position.array[i + 2] = gray * r * 5
-				// else if (gray < threshold / 2) this.particles.geometry.attributes.position.array[i + 2] = gray * g * 5
-				// else this.particles.geometry.attributes.position.array[i + 2] = gray * b * 5
+				// particle.z = gray * 2 * (averageFreq / 255)
+				if (gray < threshold / 3) this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.r * 5
+				else if (gray < threshold / 2) this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.g * 5
+				else this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.b * 5
             } else {
-                particle.z = 10000
+				this.particles.geometry.attributes.position.array[i + 2] = 10000
 			}
 
-			// this.particles.geometry.colors[i] = new THREE.Color(1, 0, 0)
-			
-			// if (gray < threshold / 3) this.particles.geometry.colors[i] = new THREE.Color(1, 0, 0)
-			// else if (gray < threshold / 2) this.particles.geometry.colors[i] = 0x00FF00
-			// else this.particles.geometry.colors[i] = 0x0000FF
+			count++
 
 		}
+
+		this.uniforms.size.value = (rgb.r + rgb.g + rgb.b) / 3 * 35 + 5
+		this.particles.geometry.attributes.position.needsUpdate = true
 		
 		// this.particles.geometry.colorsNeedUpdate = true
-        this.particles.geometry.verticesNeedUpdate = true
+        // this.particles.geometry.verticesNeedUpdate = true
             
 
 	}
