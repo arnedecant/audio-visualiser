@@ -101,7 +101,7 @@ class App {
 
 		const audioLoader = new THREE.AudioLoader()
 
-		audioLoader.load('assets/one.mp3', (buffer) => {
+		audioLoader.load('assets/two.mp3', (buffer) => {
 			this.audio.setBuffer(buffer)
 			this.audio.setLoop(true)
 			this.audio.play()
