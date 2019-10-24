@@ -107,7 +107,7 @@ export default class Engine {
 		)
 
 		const z = Math.min(window.innerWidth, window.innerHeight);
-		this.camera.position.set(0, 0, z);
+		this.camera.position.set(0, 0, 700);
 
 		// point the camera to the center
 
