@@ -37,7 +37,7 @@ class App {
 			size: { type: 'f', value: 10.0 }
 		}
 		this.indices = [] // store every index for each particle
-		this.particles = []
+		this.particles = [] // store all particles
 
 		// create new engine: setup scene, camera & lighting
 
@@ -54,6 +54,8 @@ class App {
 	}
 
 	init() {
+
+		ENGINE.scene.background = new THREE.Color(0x222222)
 
 		// load audio
 
@@ -111,7 +113,7 @@ class App {
 
 	getImageData(image = this.$video, useCache = false) {
 
-		if (useCache) return this.cache.image
+		if (useCache && this.cache.image) return this.cache.image
 
 		const w = image.videoWidth
 		const h = image.videoHeight
@@ -144,7 +146,6 @@ class App {
 		// if (!imageData) setTimeout(() => this.createParticles(), 100)
 
 		const geometry = new THREE.BufferGeometry()
-		// const material = new THREE.PointsMaterial({ size: 1, color: 0xff3b6c, sizeAttenuation: false })
 		const material = new THREE.ShaderMaterial({
 			uniforms: this.uniforms,
 			vertexShader: this.shaders.vertex,
@@ -157,9 +158,6 @@ class App {
 		const vertices = []
 		const colors = []
 		let colorsPerFace = ['#ff4b78', '#16e36d', '#162cf8', '#2016e3']
-
-		// This is necessary to avoid error
-		// geometry.morphAttributes = {}
 
 		// Push vertices
 
@@ -177,9 +175,6 @@ class App {
 				const vX = x - imageData.width / 2  	// Shift in X direction since origin is center of screen
 				const vY = -y + imageData.height / 2 	// Shift in Y direction in the same way (you need -y)
 				const vZ = gray < 300 ? gray : 10000
-
-				// const vertex = new THREE.Vector3(vX, vY, vZ)
-				// geometry.vertices.push(vertex)
 				
 				vertices.push(vX, vY, vZ)
 
@@ -233,7 +228,7 @@ class App {
 
 		if (this.analyser) {
 
-			// analyser.getFrequencyData() would be an array with a size of half of fftSize.
+			// this.analyser.getFrequencyData() would be an array with a size of half of fftSize.
 			const data = this.analyser.getFrequencyData()
 				
 			const bass = getFrequencyRangeValue(data, this.frequencyRange.bass)
@@ -248,30 +243,18 @@ class App {
 
 		}
 
-		let averageFreq = this.analyser.getAverageFrequency()
 		let count = 0
 
 		// Loop and update particles
 
-		// for (let [i, particle] of this.particles.geometry.vertices.entries()) {
 		for (let i = 0; i < this.particles.geometry.attributes.position.array.length; i += 3) {
-			
-			// if (i % (spread * 3) !== 0) {
-            //     this.particles.geometry.attributes.position.array[i + 2] = 10000
-            //     continue
-			// }
 
 			// Take an average of RGB and make it a gray value.
 			
-			// let index = i * 4
 			let index = this.indices[count]
             let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
 			
             if (gray < threshold) {
-				// if (gray < threshold / 3) particle.z = 1000
-				// else if (gray < threshold / 2) particle.z = 100
-				// else particle.z = 10
-				// particle.z = gray * 2 * (averageFreq / 255)
 				if (gray < threshold / 3) this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.r * 5
 				else if (gray < threshold / 2) this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.g * 5
 				else this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.b * 5
@@ -285,11 +268,7 @@ class App {
 
 		this.uniforms.size.value = (rgb.r + rgb.g + rgb.b) / 3 * 35 + 5
 		this.particles.geometry.attributes.position.needsUpdate = true
-		
-		// this.particles.geometry.colorsNeedUpdate = true
-        // this.particles.geometry.verticesNeedUpdate = true
-            
-
+        
 	}
 
 }

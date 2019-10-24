@@ -12,6 +12,7 @@ void main() {
     orb = smoothstep(0.0, 1.0, orb);
 
     vec3 color = vec3(orb) * vColor;
+    // vec3 color = vColor;
 
     gl_FragColor = vec4(color, 1.0);
 }
