@@ -7,7 +7,7 @@
  * @param _frequencyRange
  * @returns {number} 0.0 ~ 1.0
  */
-export function getFrequencyRangeValue(data, _frequencyRange) {
+export const getFrequencyRangeValue = (data, _frequencyRange) => {
 
     const nyquist = 48000 / 2
     const lowIndex = Math.round(_frequencyRange[0] / nyquist * data.length)

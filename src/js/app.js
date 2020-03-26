@@ -2,9 +2,8 @@
 // :: App
 // -------------------------------------------------------------------
 
-import * as THREE from 'three'
 import Engine from './Engine.js'
-import { hexToRgb } from './utilities/colors.js'
+import { hexToRgb } from './utilities/color.js'
 import { getFrequencyRangeValue } from './utilities/audio.js'
 
 class App {
@@ -13,8 +12,14 @@ class App {
 
 		// elements
 
-		this.$video = document.querySelector('#video')
-		this.$canvas = document.createElement('canvas')
+        this.$container = document.getElementById('canvas')
+        this.$video = document.getElementById('video')
+
+		this.$tempCanvas = document.createElement('canvas')
+
+		// create new engine: setup scene, camera & lighting
+
+		window.ENGINE = new Engine({ container: this.$container, assetsPath: 'assets/', debug: false })
 
 		// properties
 
@@ -23,7 +28,7 @@ class App {
 			fragment: document.querySelector('[data-shader="fragment"]').textContent
 		}
 		this.cache = {}
-		this.ctx = this.$canvas.getContext("2d")
+		this.ctx = this.$tempCanvas.getContext("2d")
 		this.fftSize = 2048
 		this.frequencyRange = {
 			bass: [20, 140],
@@ -38,10 +43,6 @@ class App {
 		}
 		this.indices = [] // store every index for each particle
 		this.particles = [] // store all particles
-
-		// create new engine: setup scene, camera & lighting
-
-		window.ENGINE = new Engine()
 
 		// events
 
@@ -120,8 +121,8 @@ class App {
 		
 		if (!w || !h) return null
 		
-		this.$canvas.width = w
-		this.$canvas.height = h
+		this.$tempCanvas.width = w
+		this.$tempCanvas.height = h
 		
 		// Reverse image like a mirror
 
@@ -155,8 +156,8 @@ class App {
 			blending: THREE.AdditiveBlending
 		})
 
-		const vertices = []
-		const colors = []
+		let vertices = []
+		let colors = []
 		let colorsPerFace = ['#ff4b78', '#16e36d', '#162cf8', '#2016e3']
 
 		// Push vertices
@@ -186,11 +187,11 @@ class App {
 
 		// Add particles to scene
 
-		const verticesArray = new Float32Array(vertices)
-		geometry.addAttribute('position', new THREE.BufferAttribute(verticesArray, 3))
+		vertices = new Float32Array(vertices)
+		geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
 	
-		const colorsArray = new Float32Array(colors)
-		geometry.addAttribute('color', new THREE.BufferAttribute(colorsArray, 3))
+		colors = new Float32Array(colors)
+		geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3))
 
 		this.particles = new THREE.Points(geometry, material)
 		ENGINE.scene.add(this.particles)
@@ -217,6 +218,8 @@ class App {
 
 	draw(imageData) {
 
+        if (!this.particles || !this.particles.geometry) return
+
 		this.uniforms.time.value += 0.5
 
 		// const spread = 2
@@ -235,19 +238,17 @@ class App {
 			const mid = getFrequencyRangeValue(data, this.frequencyRange.mid)
 			const treble = getFrequencyRangeValue(data, this.frequencyRange.treble)
 
-			rgb = {
-				r: bass,
-				g: mid,
-				b: treble
-			}
+			rgb = { r: bass, g: mid, b: treble }
 
 		}
 
 		let count = 0
 
-		// Loop and update particles
+        // Loop and update particles
+        
+        const positions = this.particles.geometry.attributes.position.array
 
-		for (let i = 0; i < this.particles.geometry.attributes.position.array.length; i += 3) {
+		for (let i = 0; i < positions.length; i += 3) {
 
 			// Take an average of RGB and make it a gray value.
 			
@@ -255,11 +256,19 @@ class App {
             let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
 			
             if (gray < threshold) {
-				if (gray < threshold / 3) this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.r * 5
-				else if (gray < threshold / 2) this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.g * 5
-				else this.particles.geometry.attributes.position.array[i + 2] = gray * rgb.b * 5
+
+				if (gray < threshold / 3) {
+                    positions[i + 2] = gray * rgb.r * 5
+                } else if (gray < threshold / 2) {
+                   positions[i + 2] = gray * rgb.g * 5
+                } else {
+                    positions[i + 2] = gray * rgb.b * 5
+                }
+                
             } else {
-				this.particles.geometry.attributes.position.array[i + 2] = 10000
+
+                positions[i + 2] = 10000
+                
 			}
 
 			count++

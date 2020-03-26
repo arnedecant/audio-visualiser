@@ -1,13 +1,23 @@
 'use strict'
 
-export function shadow(opacity, target) {
-  
-	let materialShadow = new THREE.ShadowMaterial({opacity: opacity})
-	let meshShadow = new THREE.Mesh(target.geometry, materialShadow)
+// import * as THREE from 'three'
+import { safeEval } from './math.js'
+
+export const shadow = (subject, opacity) => {
 	
-	meshShadow.position.set(target.position.x, target.position.y, target.position.z)
-	meshShadow.receiveShadow = true
+	let material = new THREE.ShadowMaterial({opacity: opacity})
+	let mesh = new THREE.Mesh(subject.geometry, material)
 	
-	return meshShadow
+	// mesh.position.set({...subject.position})
+	mesh.position.set(subject.position.x, subject.position.y, subject.position.z)
+	mesh.receiveShadow = true
+	
+	return mesh
+
+}
+
+export const hcfp = (percent) => {
+
+	return `#${new THREE.Color().setHSL(safeEval(percent), 0.5, 0.5).getHexString()}`
 
 }

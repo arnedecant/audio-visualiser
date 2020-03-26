@@ -6,6 +6,7 @@ varying vec4 vMvPosition;
 varying vec3 vColor;
 
 void main() {
+
     vec2 uv = gl_PointCoord.xy * 2.0 - 1.0;
 
     float orb = 0.1 / length(uv * 1.0);
@@ -15,4 +16,5 @@ void main() {
     // vec3 color = vColor;
 
     gl_FragColor = vec4(color, 1.0);
+    
 }

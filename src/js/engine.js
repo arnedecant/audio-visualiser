@@ -1,19 +1,25 @@
+import Preloader from "./helpers/preloader"
+
 // -------------------------------------------------------------------
 // :: Engine
 // -------------------------------------------------------------------
 
-import * as THREE from 'three'
+// import * as THREE from 'three'
 
 export default class Engine {
 
-	constructor(config = {}) {
+	constructor({ container = document.body, size = 1, background = null, debug = false, assetsPath = null }) {
 
 		// set properties
 
-		this.config = config
+		this.config = { container, size, background, debug, assetsPath }
+		// this.config = arguments[0]
 		
-		this.mouse = new THREE.Vector2()
+		this.mouse = window.MOUSE = new THREE.Vector2()
 		this.raycaster = new THREE.Raycaster()
+		this.container = container
+
+		if (typeof this.container === 'string') this.container = document.querySelector(this.container)
 
 		// init
 
@@ -27,14 +33,20 @@ export default class Engine {
 
 		this.createScene()
 
+		// setup loader(s)
+
+		this.loader = new THREE.TextureLoader()
+
+		if (this.config.assetsPath) this.loader.setPath(this.config.assetsPath)
+
 		// add events
 
 		window.addEventListener('resize', this.resize.bind(this), false)
-		window.addEventListener('click', this.click.bind(this), false)
+		// window.addEventListener('click', this.click.bind(this), false)
 		window.addEventListener('mousemove', this.mousemove.bind(this), false)
-		window.addEventListener('mousedown', this.mousedown.bind(this), false)
-		window.addEventListener('mouseup', this.mouseup.bind(this), false)
-		window.addEventListener('mousewheel', this.scroll.bind(this), { passive: true })
+		// window.addEventListener('mousedown', this.mousedown.bind(this), false)
+		// window.addEventListener('mouseup', this.mouseup.bind(this), false)
+		// window.addEventListener('mousewheel', this.scroll.bind(this), { passive: true })
 
 		// render
 
@@ -44,25 +56,17 @@ export default class Engine {
 
 	createScene() {
 
-		this.$canvas = document.createElement('canvas')
-		this.ctx = this.$canvas.getContext('2d')
-
-		// set width & height
-
-		this.height = window.innerHeight
-		this.width = window.innerWidth
-
 		// create new scene
 
 		this.scene = window.SCENE = new THREE.Scene()
 
+		// set background color
+
+		if (this.config.background) this.scene.background = new THREE.Color(this.config.background)
+
 		// add fog to the scene
 
-		this.scene.fog = new THREE.Fog(0xf7d9aa, 100, 950)
-
-		// create the renderer
-
-		this.createRenderer()
+		this.scene.fog = new THREE.Fog(0xf7d9aa, 500, 1500)
 
 		// create the camera
 
@@ -72,6 +76,10 @@ export default class Engine {
 
 		this.createLights()
 
+		// create the renderer
+
+		this.createRenderer()
+
 		// add debug helpers
 
 		if (this.config.debug) this.debug()
@@ -80,11 +88,17 @@ export default class Engine {
 
 	debug() {
 
-		let axesHelper = new THREE.AxesHelper(50)
-		this.scene.add(axesHelper)
+		let axes = new THREE.AxesHelper(50)
+		let grid = new THREE.GridHelper(2000, 40, 0x000000, 0x000000)
 
-		let gridHelper = new THREE.GridHelper(1000, 1000, 0x3f3f3f, 0x3f3f3f)
-		this.scene.add(gridHelper)
+		grid.material.opacity = 0.2
+		grid.material.transparent = true
+
+		this.scene.add(axes)
+		this.scene.add(grid)
+		
+		this.stats = new Stats()
+		this.container.appendChild(this.stats.dom)
 
 	}
 
@@ -106,10 +120,11 @@ export default class Engine {
 			this.farPlane
 		)
 
-		const z = Math.min(window.innerWidth, window.innerHeight);
+		// update camera position
+
 		this.camera.position.set(0, 0, 700);
 
-		// point the camera to the center
+		// point camera to center
 
 		this.camera.lookAt(new THREE.Vector3(0,0,0))
 
@@ -126,7 +141,7 @@ export default class Engine {
 
 		// set the size
 
-		this.renderer.setSize(this.width, this.height)
+		this.resize()
 
 		// enable shadowMap
 
@@ -138,8 +153,11 @@ export default class Engine {
 
 		// append to DOM
 
-		this.container = document.querySelector('#world')
 		this.container.appendChild(this.renderer.domElement)
+
+		// add controls
+
+		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
 
 	}
 
@@ -147,134 +165,29 @@ export default class Engine {
 
 		// create a new ambient light
 
-		this.light = new THREE.AmbientLight(0xffffff, 0.5)
-
-		// create a new shadow light
-
-		this.shadowLight = new THREE.DirectionalLight(0xffffff, 0.5)
-		this.shadowLight.position.set(200, 200, 200)
-		this.shadowLight.castShadow = true
-
-		// create a new back light
-
-		this.backLight = new THREE.DirectionalLight(0xffffff, 0.2)
-		this.backLight.position.set(-100, 200, 50)
-		this.backLight.castShadow = true
+		this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
 
 		// add lights to the scene
 
-		this.scene.add(this.light)
-		// this.scene.add(this.shadowLight)
-		// this.scene.add(this.backLight)
+		this.scene.add(this.ambientLight)
 
 	}
 
-	updateZoom(axis = 'y') {
+	setSize() {
 
-		// no need to zoom when scrollSpeed hasn't been updated
+		// set initial width and height
 
-		if (this.scrollSpeed == 0) return
+		this.width = this.container === document.body ? window.innerWidth : this.container.offsetWidth
+		this.height = this.container === document.body ? window.innerHeight : this.container.offsetHeight
 
-		// zoom per frame
+		// update according to size multiplier
 
-		let zpf = this.config.camera.zpf
+		this.width *= this.config.size
+		this.height *= this.config.size
 
-		// min & max values
+		// set renderer dimensions
 
-		let min = this.config.camera.min[axis],
-			max = this.config.camera.max[axis]
-
-		// smoother scrolling at the end of the animation
-		// prevents zooms very small values, for example 1.2 ...
-
-		if (Math.abs(this.scrollSpeed) < (2 * zpf)) {
-			zpf = zpf / 2
-		}
-
-		// redefine the zoom per frame
-
-		if (this.scrollSpeed > 0) {
-
-			// zoom out
-
-			if (this.scrollSpeed < zpf) {
-				zpf = this.scrollSpeed
-				this.scrollSpeed = 0
-			} else {
-				this.scrollSpeed -= zpf
-			}
-
-		} else if (this.scrollSpeed < 0) {
-
-			// zoom in
-
-			if (this.scrollSpeed > -zpf) {
-				zpf = this.scrollSpeed
-				this.scrollSpeed = 0
-			} else {
-				this.scrollSpeed += zpf
-				zpf = -zpf
-			}
-
-		}
-
-		// get new z-pos
-
-		let pos = this.camera.position[axis] - zpf
-
-		// set boundaries for z-pos
-
-		pos = (pos > min) ? pos : min
-		pos = (pos < max) ? pos : max
-
-		// apply position if it's above threshold
-
-		this.camera.position[axis] = pos
-
-		// update controls
-
-		// if (this.controls) this.controls.update()
-
-	}
-
-	scroll(e) {
-
-		// only store the scroll value
-		// zoom will be handled in the render function
-
-		this.scrollSpeed = e.deltaY / 2
-
-	}
-
-	click(e) {
-
-		e.preventDefault()
-
-	}
-
-	mousemove(e) {
-
-		e.preventDefault()
-
-		// calculate mouse position in normalized device coordinates
-		// (-1 to +1) for both components
-
-		this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
-		this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1
-
-		// console.log({ x: this.mouse.x, y: this.mouse.y })
-
-	}
-
-	mousedown(e) {
-
-		
-
-	}
-
-	mouseup(e) {
-
-		
+		this.renderer.setSize(this.width, this.height)
 
 	}
 
@@ -282,12 +195,7 @@ export default class Engine {
 
 		// set canvas dimensions
 
-		this.width = window.innerWidth;
-		this.height = window.innerHeight;
-
-		// set renderer dimensions
-
-		this.renderer.setSize(this.width, this.height)
+		this.setSize()
 
 		// set camera
 
@@ -301,15 +209,44 @@ export default class Engine {
 
 	}
 
+	mousemove(e) {
+
+		e.preventDefault()
+
+		// calculate mouse position in normalized device coordinates
+		// (-1 to +1) for both components
+
+		MOUSE.x = (e.clientX / window.innerWidth) * 2 - 1
+		MOUSE.y = - (e.clientY / window.innerHeight) * 2 + 1
+
+		// console.log({ x: this.mouse.x, y: this.mouse.y })
+
+	}
+
+
 	add(mesh) { this.scene.add(mesh) }
 	remove(mesh) { this.scene.remove(mesh) }
+	clear() {
 
-	render() {
+		while (this.scene.children.length > 1) {
+			this.scene.remove(this.scene.children[0])
+		}
 
-		// update zoom
+	}
+	load(path, fn) {
 
-		// this.updateZoom()
+		let loader = this.loader
+
+		if (Array.isArray(path)) loader = this.cubeLoader
+
+		return loader.load(path, fn)
+
+	}
+
+	render(dt) {
+
 		if (this.controls) this.controls.update()
+		if (this.stats) this.stats.update()
 
 		// render
 
