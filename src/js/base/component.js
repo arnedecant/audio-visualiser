@@ -1,4 +1,4 @@
-import Dispatcher from "../helpers/dispatcher"
+import Dispatcher from '../helpers/dispatcher'
 
 // -------------------------------------------------------------------
 // :: Component

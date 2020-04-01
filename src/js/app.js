@@ -5,6 +5,7 @@
 import Engine from './Engine.js'
 import { hexToRgb } from './utilities/color.js'
 import { getFrequencyRangeValue } from './utilities/audio.js'
+import Modal from './components/modal.js'
 
 class App {
 
@@ -23,13 +24,19 @@ class App {
 
 		// properties
 
+		this.modals = {
+			privacy: new Modal('privacy')
+		}
+
 		this.shaders = {
 			vertex: document.querySelector('[data-shader="vertex"]').textContent,
 			fragment: document.querySelector('[data-shader="fragment"]').textContent
 		}
+
 		this.cache = {}
 		this.ctx = this.$tempCanvas.getContext("2d")
 		this.fftSize = 2048
+
 		this.frequencyRange = {
 			bass: [20, 140],
 			lowMid: [140, 400],
@@ -37,20 +44,33 @@ class App {
 			highMid: [2600, 5200],
 			treble: [5200, 14000]
 		}
+
 		this.uniforms = {
 			time: { type: 'f', value: 0.0 },
 			size: { type: 'f', value: 10.0 }
 		}
+
 		this.indices = [] // store every index for each particle
 		this.particles = [] // store all particles
 
 		// events
 
 		document.body.addEventListener('click', this.click.bind(this))
+		this.modals.privacy.onClose.addListener(this.init.bind(this))
 
-		// init
+		// setup
 
-		this.init()
+		this.setup()
+
+	}
+
+	setup() {
+
+		ENGINE.scene.background = new THREE.Color(0x222222)
+
+		this.audioListener = new THREE.AudioListener()
+
+		this.modals.privacy.open()
 
 	}
 
@@ -74,6 +94,9 @@ class App {
 
 	click(e) {
 
+		if (e.target.nodeName !== 'CANVAS') return
+
+		if (this.audioListener) this.audioListener.context.resume()
 		if (!this.audio) return
 
 		if (this.audio.isPlaying) this.audio.pause()
@@ -89,20 +112,21 @@ class App {
 		}
 
 		navigator.getUserMedia(options, (stream) => {
+			console.log(stream)
 			this.$video.srcObject = stream
-			this.$video.addEventListener("loadeddata", (e) => this.createParticles(e))
+			this.$video.addEventListener('loadeddata', (e) => this.createParticles(e))
 		}, (error) => console.log(error))
 
 	}
 
 	initAudio() {
 
-		const audioListener = new THREE.AudioListener()
-		this.audio = new THREE.Audio(audioListener)
+		this.audioListener = new THREE.AudioListener()
+		this.audio = new THREE.Audio(this.audioListener)
 
-		const audioLoader = new THREE.AudioLoader()
+		this.audioLoader = new THREE.AudioLoader()
 
-		audioLoader.load('assets/two.mp3', (buffer) => {
+		this.audioLoader.load('assets/two.mp3', (buffer) => {
 			this.audio.setBuffer(buffer)
 			this.audio.setLoop(true)
 			this.audio.play()
@@ -283,3 +307,8 @@ class App {
 }
 
 export default new App()
+
+navigator.getUserMedia = ( navigator.getUserMedia ||
+	navigator.webkitGetUserMedia ||
+	navigator.mozGetUserMedia ||
+	navigator.msGetUserMedia)

@@ -26,6 +26,12 @@ export default class Dispatcher {
 
     }
 
+    addEventListener(listener) {
+
+        this.addListener(listener)
+
+    }
+
     // To remove event dispatchers, handlers should be variables
     // because .bind(this) creates a new instance when called
     // Example usage (in some view or controller):
