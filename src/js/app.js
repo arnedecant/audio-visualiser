@@ -11,6 +11,9 @@ class App {
 
 	constructor() {
 
+		this.url = new URL(window.location.href)
+		this.debug = this.url.searchParams.get('debug') || 0
+
 		// elements
 
         this.$container = document.getElementById('canvas')
@@ -20,7 +23,7 @@ class App {
 
 		// create new engine: setup scene, camera & lighting
 
-		window.ENGINE = new Engine({ container: this.$container, assetsPath: 'assets/', debug: false })
+		window.ENGINE = new Engine({ container: this.$container, assetsPath: 'assets/', debug: this.debug })
 
 		// properties
 
@@ -70,7 +73,8 @@ class App {
 
 		this.audioListener = new THREE.AudioListener()
 
-		this.modals.privacy.open()
+		if (this.debug) this.init()
+		else this.modals.privacy.open()
 
 	}
 
@@ -84,7 +88,7 @@ class App {
 
 		// load webcam stream
 
-		this.initWebcam()
+		this.initUserMedia()
 
 		// render
 
@@ -104,18 +108,16 @@ class App {
 
 	}
 
-	initWebcam() {
+	initUserMedia() {
 
-		const options = {
-			video: true,
-			audio: false
-		}
+		const options = { audio: true, video: { facingMode: 'user' } }
 
-		navigator.getUserMedia(options, (stream) => {
-			console.log(stream)
+		navigator.mediaDevices.getUserMedia(options).then((stream) => {
+
 			this.$video.srcObject = stream
 			this.$video.addEventListener('loadeddata', (e) => this.createParticles(e))
-		}, (error) => console.log(error))
+
+		}).catch((error) => console.error('Error loading user media:', error))
 
 	}
 
@@ -182,7 +184,8 @@ class App {
 
 		let vertices = []
 		let colors = []
-		let colorsPerFace = ['#ff4b78', '#16e36d', '#162cf8', '#2016e3']
+		// let colorsPerFace = ['#ff4b78', '#16e36d', '#162cf8', '#2016e3']
+		let colorsPerFace = ['#f0932b', '#eb4d4b', '#6ab04c', '#22a6b3', '#be2edd', '#4834d4', '#130f40']
 
 		// Push vertices
 
@@ -204,6 +207,9 @@ class App {
 				vertices.push(vX, vY, vZ)
 
 				const color = hexToRgb(colorsPerFace[Math.floor(Math.random() * colorsPerFace.length)])
+				// console.log(data)
+				// const color = hexToRgb(gray)
+				// const color = hexToRgb('#555555')
             	colors.push(color.r, color.g, color.b)
 
 			}
@@ -248,6 +254,7 @@ class App {
 
 		// const spread = 2
 		const threshold = 300
+		const multiplier = 3
 
 		let rgb = {}
 
@@ -282,11 +289,11 @@ class App {
             if (gray < threshold) {
 
 				if (gray < threshold / 3) {
-                    positions[i + 2] = gray * rgb.r * 5
+                    positions[i + 2] = gray * rgb.r * multiplier
                 } else if (gray < threshold / 2) {
-                   positions[i + 2] = gray * rgb.g * 5
+                   positions[i + 2] = gray * rgb.g * multiplier
                 } else {
-                    positions[i + 2] = gray * rgb.b * 5
+                    positions[i + 2] = gray * rgb.b * multiplier
                 }
                 
             } else {

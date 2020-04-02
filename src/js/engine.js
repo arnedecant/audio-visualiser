@@ -122,7 +122,7 @@ export default class Engine {
 
 		// update camera position
 
-		this.camera.position.set(0, 0, 700);
+		this.camera.position.set(0, 0, 850);
 
 		// point camera to center
 

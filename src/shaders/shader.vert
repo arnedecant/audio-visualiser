@@ -8,11 +8,11 @@ uniform float size;
 varying vec4 vMvPosition;
 varying vec3 vColor;
 
-float map(float value, float beforeMin, float beforeMax, float afterMin, float afterMax) {
+// float map(float value, float beforeMin, float beforeMax, float afterMin, float afterMax) {
 
-    return afterMin + (afterMax - afterMin) * ((value - beforeMin) / (beforeMax - beforeMin));
+//     return afterMin + (afterMax - afterMin) * ((value - beforeMin) / (beforeMax - beforeMin));
 
-}
+// }
 
 void main() {
 
