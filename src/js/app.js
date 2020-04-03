@@ -3,10 +3,11 @@
 // -------------------------------------------------------------------
 
 import Engine from './Engine.js'
-import { hexToRgb } from './utilities/color.js'
-import { getFrequencyRangeValue } from './utilities/audio.js'
 import Modal from './components/modal.js'
 import Interface from './components/interface.js'
+
+import { hexToRgb } from './utilities/color.js'
+import { getFrequencyRangeValue } from './utilities/audio.js'
 
 class App {
 
@@ -62,7 +63,7 @@ class App {
 
 		document.body.addEventListener('click', this.click.bind(this))
 		this.modals.privacy.onClose.addListener(this.init.bind(this))
-		this.components.interface.onClick.addListener(this.init.bind(this))
+		this.components.interface.onClick.addListener(this.reset.bind(this))
 
 		// setup
 
@@ -91,23 +92,26 @@ class App {
 
 	}
 
-	init() {
+	reset() {
 
-		// Clear canvas
+		console.log('reset')
+
+		// Clear canvas, create
+		// particles and render
 
 		this.clear()
+		this.createParticles()
 
-		// load audio
+	}
 
-		if (!this.audio) this.initAudio()
+	init() {
 
-		// load webcam stream
+		// Clear canvas, load audio, 
+		// load webcam and render
 
-		if (this.$video.srcObject) this.createParticles()
-		else this.initUserMedia()
-
-		// render
-
+		this.clear()
+		this.initAudio()
+		this.initUserMedia()
 		this.render()
 
 	}
