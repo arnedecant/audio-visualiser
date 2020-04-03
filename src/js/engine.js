@@ -122,7 +122,7 @@ export default class Engine {
 
 		// update camera position
 
-		this.camera.position.set(0, 0, 850);
+		this.camera.position.set(0, 0, 700);
 
 		// point camera to center
 
@@ -225,11 +225,33 @@ export default class Engine {
 
 
 	add(mesh) { this.scene.add(mesh) }
-	remove(mesh) { this.scene.remove(mesh) }
-	clear() {
+	remove(mesh) { 
 
-		while (this.scene.children.length > 1) {
-			this.scene.remove(this.scene.children[0])
+		// if (!(mesh instanceof THREE.Mesh)) return
+
+		mesh.geometry.dispose()
+		mesh.geometry = null
+		mesh.material.dispose()
+		mesh.material = null
+		mesh.dispose()
+		mesh = null
+
+	}
+	clear(obj = this.scene) {
+
+		if (obj instanceof THREE.Mesh) {
+
+			this.remove(obj)
+
+		} else {
+
+			if (obj.children === undefined) return 
+			
+			while (obj.children.length > 0) {
+				this.clear(obj.children[0])
+				obj.remove(obj.children[0])
+			}
+
 		}
 
 	}

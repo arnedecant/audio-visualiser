@@ -6,6 +6,7 @@ import Engine from './Engine.js'
 import { hexToRgb } from './utilities/color.js'
 import { getFrequencyRangeValue } from './utilities/audio.js'
 import Modal from './components/modal.js'
+import Interface from './components/interface.js'
 
 class App {
 
@@ -20,6 +21,7 @@ class App {
         this.$video = document.getElementById('video')
 
 		this.$tempCanvas = document.createElement('canvas')
+		this.ctx = this.$tempCanvas.getContext("2d")
 
 		// create new engine: setup scene, camera & lighting
 
@@ -31,14 +33,17 @@ class App {
 			privacy: new Modal('privacy')
 		}
 
+		this.components = {
+			interface: new Interface('.interface')
+		}
+
 		this.shaders = {
 			vertex: document.querySelector('[data-shader="vertex"]').textContent,
 			fragment: document.querySelector('[data-shader="fragment"]').textContent
 		}
 
-		this.cache = {}
-		this.ctx = this.$tempCanvas.getContext("2d")
 		this.fftSize = 2048
+		this.cache = {}
 
 		this.frequencyRange = {
 			bass: [20, 140],
@@ -53,13 +58,11 @@ class App {
 			size: { type: 'f', value: 10.0 }
 		}
 
-		this.indices = [] // store every index for each particle
-		this.particles = [] // store all particles
-
 		// events
 
 		document.body.addEventListener('click', this.click.bind(this))
 		this.modals.privacy.onClose.addListener(this.init.bind(this))
+		this.components.interface.onClick.addListener(this.init.bind(this))
 
 		// setup
 
@@ -69,7 +72,7 @@ class App {
 
 	setup() {
 
-		ENGINE.scene.background = new THREE.Color(0x222222)
+		this.clear()
 
 		this.audioListener = new THREE.AudioListener()
 
@@ -78,17 +81,30 @@ class App {
 
 	}
 
+	clear() {
+
+		ENGINE.clear()
+		ENGINE.scene.background = new THREE.Color(0x222222)
+
+		this.indices = [] // store every index for each particle
+		this.particles = [] // store all particles
+
+	}
+
 	init() {
 
-		ENGINE.scene.background = new THREE.Color(0x222222)
+		// Clear canvas
+
+		this.clear()
 
 		// load audio
 
-		this.initAudio()
+		if (!this.audio) this.initAudio()
 
 		// load webcam stream
 
-		this.initUserMedia()
+		if (this.$video.srcObject) this.createParticles()
+		else this.initUserMedia()
 
 		// render
 
@@ -116,6 +132,8 @@ class App {
 
 			this.$video.srcObject = stream
 			this.$video.addEventListener('loadeddata', (e) => this.createParticles(e))
+
+			this.components.interface.enable()
 
 		}).catch((error) => console.error('Error loading user media:', error))
 
@@ -206,10 +224,12 @@ class App {
 				
 				vertices.push(vX, vY, vZ)
 
-				const color = hexToRgb(colorsPerFace[Math.floor(Math.random() * colorsPerFace.length)])
-				// console.log(data)
-				// const color = hexToRgb(gray)
-				// const color = hexToRgb('#555555')
+				let color = hexToRgb('#555555')
+				
+				if (this.components.interface.settings.colors == 'discodip') {
+					color = hexToRgb(colorsPerFace[Math.floor(Math.random() * colorsPerFace.length)])
+				}
+				
             	colors.push(color.r, color.g, color.b)
 
 			}
@@ -218,13 +238,13 @@ class App {
 		// Add particles to scene
 
 		vertices = new Float32Array(vertices)
-		geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
+		geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
 	
 		colors = new Float32Array(colors)
-		geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3))
+		geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 
 		this.particles = new THREE.Points(geometry, material)
-		ENGINE.scene.add(this.particles)
+		ENGINE.add(this.particles)
 
 	}
 

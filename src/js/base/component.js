@@ -33,6 +33,24 @@ export default class Component {
 		
 
 	}
+    
+    enable() {
+
+        this.element.removeAttribute('disabled')
+
+    }
+
+    disable() {
+
+        this.element.setAttribute('disabled', 'disabled')
+
+    }
+
+    hide() {
+
+        this.element.setAttribute('disabled', 'disabled')
+
+    }
 
 	click(e) {
 
