@@ -12,7 +12,8 @@ export default class Interface extends Component {
         super(selector)
 
         this.settings = {
-            colors: 'grayscale',
+            theme: 'grayscale',
+            video: 'webcam',
             state: 1
         }
 
@@ -27,10 +28,11 @@ export default class Interface extends Component {
         if (!this.ALLOWED_ELEMENTS.includes(e.target.nodeName)) return
 
         const tmpSettings = JSON.stringify(this.settings)
+        const name = e.target.name
 
-        switch(e.target.name) {
-            case 'colors':
-                this.settings.colors = e.target.options[e.target.selectedIndex].value
+        switch(e.target.nodeName) {
+            case 'SELECT':
+                this.settings[name] = e.target.options[e.target.selectedIndex].value
                 break
         }
 

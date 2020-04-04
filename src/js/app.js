@@ -22,7 +22,7 @@ class App {
         this.$video = document.getElementById('video')
 
 		this.$tempCanvas = document.createElement('canvas')
-		this.ctx = this.$tempCanvas.getContext("2d")
+		this.ctx = this.$tempCanvas.getContext('2d')
 
 		// create new engine: setup scene, camera & lighting
 
@@ -56,7 +56,10 @@ class App {
 
 		this.uniforms = {
 			time: { type: 'f', value: 0.0 },
-			size: { type: 'f', value: 10.0 }
+			size: { type: 'f', value: 10.0 },
+			isPlaying: { type: 'b', value: true },
+			isWebcam: { type: 'b', value: true },
+			texFire: { value: ENGINE.load('image/flame.png') },
 		}
 
 		// events
@@ -87,27 +90,23 @@ class App {
 		ENGINE.clear()
 		ENGINE.scene.background = new THREE.Color(0x222222)
 
-		this.indices = [] // store every index for each particle
-		this.particles = [] // store all particles
+		this.indices = [] 		// store every index for each particle
+		this.particles = [] 	// store all particles
 
 	}
 
 	reset() {
 
-		console.log('reset')
-
-		// Clear canvas, create
-		// particles and render
-
 		this.clear()
-		this.createParticles()
+
+		const settings = this.components.interface.settings
+
+		if (settings.video === 'webcam') this.initUserMedia()
+		else this.initVideo(settings)
 
 	}
 
 	init() {
-
-		// Clear canvas, load audio, 
-		// load webcam and render
 
 		this.clear()
 		this.initAudio()
@@ -123,23 +122,13 @@ class App {
 		if (this.audioListener) this.audioListener.context.resume()
 		if (!this.audio) return
 
-		if (this.audio.isPlaying) this.audio.pause()
-		else this.audio.play()
-
-	}
-
-	initUserMedia() {
-
-		const options = { audio: true, video: { facingMode: 'user' } }
-
-		navigator.mediaDevices.getUserMedia(options).then((stream) => {
-
-			this.$video.srcObject = stream
-			this.$video.addEventListener('loadeddata', (e) => this.createParticles(e))
-
-			this.components.interface.enable()
-
-		}).catch((error) => console.error('Error loading user media:', error))
+		if (this.audio.isPlaying) {
+			this.audio.pause()
+			setTimeout(() => this.uniforms.playing.value = false, 200)
+		} else {
+			this.audio.play()
+			this.uniforms.playing.value = true
+		}
 
 	}
 
@@ -157,6 +146,28 @@ class App {
 		})
 
 		this.analyser = new THREE.AudioAnalyser(this.audio, this.fftSize)
+
+	}
+
+	async initUserMedia() {
+
+		this.uniforms.isWebcam.value = true
+
+		const options = { audio: false, video: { facingMode: 'user' } }
+		const stream = await navigator.mediaDevices.getUserMedia(options)
+
+		this.$video.srcObject = stream
+		this.$video.addEventListener('loadeddata', (e) => this.createParticles(e))
+
+		this.components.interface.enable()
+
+	}
+
+	initVideo(settings = this.components.interface.settings) {
+
+		this.uniforms.isWebcam.value = false
+
+		console.log('initVideo')
 
 	}
 
@@ -230,7 +241,7 @@ class App {
 
 				let color = hexToRgb('#555555')
 				
-				if (this.components.interface.settings.colors == 'discodip') {
+				if (this.components.interface.settings.theme == 'discodip') {
 					color = hexToRgb(colorsPerFace[Math.floor(Math.random() * colorsPerFace.length)])
 				}
 				

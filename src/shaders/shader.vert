@@ -6,6 +6,7 @@ uniform float time;
 uniform float size;
 
 varying vec4 vMvPosition;
+varying vec3 vPosition;
 varying vec3 vColor;
 
 // float map(float value, float beforeMin, float beforeMax, float afterMin, float afterMax) {
@@ -14,11 +15,25 @@ varying vec3 vColor;
 
 // }
 
+// void main() {
+
+//     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+//     vMvPosition = mvPosition;
+//     vColor = color;
+
+//     // gl_PointSize = size + ((sin(time * 0.05) + 1.0) / 2.0) * 10.0;
+//     gl_PointSize = size;
+//     gl_Position = projectionMatrix * mvPosition;
+    
+// }
+
 void main() {
 
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
 
     vMvPosition = mvPosition;
+    vPosition = position;
     vColor = color;
 
     // gl_PointSize = size + ((sin(time * 0.05) + 1.0) / 2.0) * 10.0;

@@ -68,7 +68,10 @@ body {
     width: 10rem;
     height: auto;
     transform: scaleX(-1);
-    margin-bottom: 0.5em;
+}
+
+.interface label {
+    margin: 0.5em 0;
 }
 
 dialog {
