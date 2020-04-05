@@ -67,6 +67,8 @@ class App {
 		// events
 
 		document.body.addEventListener('click', this.click.bind(this))
+		this.$video.addEventListener('loadeddata', this.createParticles.bind(this))
+
 		this.modals.privacy.onClose.addListener(this.init.bind(this))
 		this.components.interface.onClick.addListener(this.reset.bind(this))
 
@@ -101,13 +103,22 @@ class App {
 
 		const settings = this.components.interface.settings
 
-		// A normal (.mp4) video: initVideo()
-		// Webcam already loaded: createParticles()
-		// Webcam needs loading: initUserMedia()
+		if (settings.video === 'webcam') {
 
-		if (settings.video !== 'webcam') this.initVideo()
-		else if (this.state.userMedia) this.createParticles()
-		else this.initUserMedia()
+			ENGINE.camera.position.z = 700
+			this.uniforms.isWebcam.value = true
+
+			this.initUserMedia()
+
+		} else {
+
+			ENGINE.camera.position.z = 1000
+			this.uniforms.isWebcam.value = false
+
+			this.$video.srcObject = null
+			this.$video.src = `assets/video/${ settings.video }.mp4`
+
+		}
 
 	}
 
@@ -129,10 +140,10 @@ class App {
 
 		if (this.audio.isPlaying) {
 			this.audio.pause()
-			setTimeout(() => this.uniforms.playing.value = false, 200)
+			setTimeout(() => this.uniforms.isPlaying.value = false, 200)
 		} else {
 			this.audio.play()
-			this.uniforms.playing.value = true
+			this.uniforms.isPlaying.value = true
 		}
 
 	}
@@ -156,24 +167,18 @@ class App {
 
 	async initUserMedia() {
 
-		this.uniforms.isWebcam.value = true
+		if (this.stream) {
+			this.$video.srcObject = this.stream
+			return
+		}
 
 		const options = { audio: false, video: { facingMode: 'user' } }
-		const stream = await navigator.mediaDevices.getUserMedia(options)
+		this.stream = await navigator.mediaDevices.getUserMedia(options)
 
-		this.$video.srcObject = stream
-		this.$video.addEventListener('loadeddata', (e) => this.createParticles(e))
+		this.$video.srcObject = this.stream
 
 		this.components.interface.enable()
 		this.state.userMedia = 1
-
-	}
-
-	initVideo(settings = this.components.interface.settings) {
-
-		this.uniforms.isWebcam.value = false
-
-		console.log('initVideo')
 
 	}
 
@@ -206,6 +211,8 @@ class App {
 	}
 
 	createParticles() {
+
+		if (!this.indices) return
 		
 		const imageData = this.getImageData()
 
