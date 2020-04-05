@@ -30,6 +30,8 @@ class App {
 
 		// properties
 
+		this.state = {}
+
 		this.modals = {
 			privacy: new Modal('privacy')
 		}
@@ -76,8 +78,6 @@ class App {
 
 	setup() {
 
-		this.clear()
-
 		this.audioListener = new THREE.AudioListener()
 
 		if (this.debug) this.init()
@@ -101,8 +101,13 @@ class App {
 
 		const settings = this.components.interface.settings
 
-		if (settings.video === 'webcam') this.initUserMedia()
-		else this.initVideo(settings)
+		// A normal (.mp4) video: initVideo()
+		// Webcam already loaded: createParticles()
+		// Webcam needs loading: initUserMedia()
+
+		if (settings.video !== 'webcam') this.initVideo()
+		else if (this.state.userMedia) this.createParticles()
+		else this.initUserMedia()
 
 	}
 
@@ -160,6 +165,7 @@ class App {
 		this.$video.addEventListener('loadeddata', (e) => this.createParticles(e))
 
 		this.components.interface.enable()
+		this.state.userMedia = 1
 
 	}
 

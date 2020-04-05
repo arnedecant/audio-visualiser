@@ -225,6 +225,7 @@ export default class Engine {
 
 
 	add(mesh) { this.scene.add(mesh) }
+
 	remove(mesh) { 
 
 		// if (!(mesh instanceof THREE.Mesh)) return
@@ -237,6 +238,7 @@ export default class Engine {
 		mesh = null
 
 	}
+
 	clear(obj = this.scene) {
 
 		if (obj instanceof THREE.Mesh) {
@@ -245,7 +247,7 @@ export default class Engine {
 
 		} else {
 
-			if (obj.children === undefined) return 
+			if (obj.children == undefined) return 
 			
 			while (obj.children.length > 0) {
 				this.clear(obj.children[0])
@@ -255,6 +257,7 @@ export default class Engine {
 		}
 
 	}
+
 	load(path, fn) {
 
 		let loader = this.loader
