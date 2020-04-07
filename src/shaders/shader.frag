@@ -1,6 +1,7 @@
 //#define GLSLIFY 1
 
 uniform float time;
+uniform float density;
 uniform bool isWebcam;
 uniform bool isPlaying;
 
@@ -11,11 +12,11 @@ varying vec3 vPosition;
 void main() {
 
     vec2 uv = gl_PointCoord.xy * 2.0 - 1.0;
-    vec3 color = vec3(0.0);
+    vec3 color = vec3(0.005);
 
     if (vPosition.z > 0.1 || isWebcam == true) {
 
-        float orb = 0.1 / length(uv * 1.75);
+        float orb = density / length(uv * 2.0);
 
         orb = smoothstep(0.0, 1.0, orb);
         color = vec3(orb) * vColor;

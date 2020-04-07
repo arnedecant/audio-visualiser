@@ -59,6 +59,7 @@ class App {
 		this.uniforms = {
 			time: { type: 'f', value: 0.0 },
 			size: { type: 'f', value: 10.0 },
+			density: { type: 'f', value: 0.1 },
 			isPlaying: { type: 'b', value: true },
 			isWebcam: { type: 'b', value: true },
 			texFire: { value: ENGINE.load('image/flame.png') },
@@ -105,15 +106,17 @@ class App {
 
 		if (settings.video === 'webcam') {
 
-			ENGINE.camera.position.z = 700
+			ENGINE.camera.position.z = 750
 			this.uniforms.isWebcam.value = true
+			this.uniforms.density.value = 0.1
 
 			this.initUserMedia()
 
 		} else {
 
-			ENGINE.camera.position.z = 1000
+			ENGINE.camera.position.z = 1500
 			this.uniforms.isWebcam.value = false
+			this.uniforms.density.value = 0.05
 
 			this.$video.srcObject = null
 			this.$video.src = `assets/video/${ settings.video }.mp4`
@@ -303,6 +306,7 @@ class App {
 		// const spread = 2
 		const threshold = 300
 		const multiplier = 3
+		const skip = 2
 
 		let rgb = {}
 
@@ -312,7 +316,7 @@ class App {
 
 			// this.analyser.getFrequencyData() would be an array with a size of half of fftSize.
 			const data = this.analyser.getFrequencyData()
-				
+			
 			const bass = getFrequencyRangeValue(data, this.frequencyRange.bass)
 			const mid = getFrequencyRangeValue(data, this.frequencyRange.mid)
 			const treble = getFrequencyRangeValue(data, this.frequencyRange.treble)
@@ -332,9 +336,10 @@ class App {
 			// Take an average of RGB and make it a gray value.
 			
 			let index = this.indices[count]
-            let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
+			let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
+			let render = ((this.uniforms.isWebcam.value) || (i % skip === 0))
 			
-            if (gray < threshold) {
+            if (gray < threshold && render) {
 
 				if (gray < threshold / 3) {
                     positions[i + 2] = gray * rgb.r * multiplier
