@@ -1,14 +1,14 @@
-import Dispatcher from '../helpers/dispatcher'
-
 // -------------------------------------------------------------------
 // :: Component
 // -------------------------------------------------------------------
 
+import Dispatcher from '../helpers/dispatcher'
+
 export default class Component {
 
-	constructor(selector = null, options = {}) {
+	constructor (selector = null, options = {}) {
 
-        this.selector = selector
+    this.selector = selector
 		this.element = selector
 		this.options = options
 
@@ -22,43 +22,43 @@ export default class Component {
 		this.template = document.querySelector(`template[data-name="${ this.element.dataset.component }"]`)
 		if (this.template) this.template = this.template.content.cloneNode(true)
 
-        this.element.addEventListener('click', this.click.bind(this))
+		this.element.addEventListener('click', this.click.bind(this))
 
-        this.init()
+		this.init()
 
 	}
 
-	init() {
+	init () {
 
 		
 
 	}
     
-    enable() {
+	enable () {
 
-        this.element.removeAttribute('disabled')
-
-    }
-
-    disable() {
-
-        this.element.setAttribute('disabled', 'disabled')
-
-    }
-
-    hide() {
-
-        this.element.setAttribute('disabled', 'disabled')
-
-    }
-
-	click(e) {
-
-		this.onClick.notify({ component: this, event: e })
+		this.element.removeAttribute('disabled')
 
 	}
 
-	render(timestamp) {
+	disable () {
+
+		this.element.setAttribute('disabled', 'disabled')
+
+	}
+
+	hide () {
+
+		this.element.setAttribute('disabled', 'disabled')
+
+	}
+
+	click (e) {
+
+	this.onClick.notify({ component: this, event: e })
+
+	}
+
+	render (timestamp) {
 
 		// add self to the requestAnimationFrame
 

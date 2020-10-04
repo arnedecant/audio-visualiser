@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------
-// :: Modal
+// :: Interface
 // -------------------------------------------------------------------
 
 import Component from '../base/component'
@@ -7,39 +7,41 @@ import Dispatcher from '../helpers/dispatcher'
 
 export default class Interface extends Component { 
 
-	constructor(selector) {
+	constructor (selector) {
 
-        super(selector)
+		super(selector)
 
-        this.settings = {
-            theme: 'grayscale',
-            video: 'webcam',
-            state: 1
-        }
+		this.settings = {
+			theme: 'grayscale',
+			video: 'webcam',
+			state: 1
+		}
 
-        this.ALLOWED_ELEMENTS = ['BUTTON', 'SELECT', 'ANCHOR', 'INPUT']
+		this.ALLOWED_ELEMENTS = ['BUTTON', 'SELECT', 'ANCHOR', 'INPUT']
 
-    }
+		document.addEventListener('input', this.input.bind(this))
 
-    click(e) {
+	}
 
-        e.preventDefault()
+	input (e) {
 
-        if (!this.ALLOWED_ELEMENTS.includes(e.target.nodeName)) return
+		e.preventDefault()
 
-        const tmpSettings = JSON.stringify(this.settings)
-        const name = e.target.name
+		if (!this.ALLOWED_ELEMENTS.includes(e.target.nodeName)) return
 
-        switch(e.target.nodeName) {
-            case 'SELECT':
-                this.settings[name] = e.target.options[e.target.selectedIndex].value
-                break
-        }
+		const tmpSettings = JSON.stringify(this.settings)
+		const name = e.target.name
 
-        if (JSON.stringify(this.settings) === tmpSettings) return
+		switch (e.target.nodeName) {
+			case 'SELECT':
+				this.settings[name] = e.target.options[e.target.selectedIndex].value
+				break
+		}
 
-        super.click(e)
+		if (JSON.stringify(this.settings) === tmpSettings) return
 
-    }
+		super.click(e)
+
+	}
 
 }
