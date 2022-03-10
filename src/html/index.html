@@ -37,7 +37,7 @@
 
 
 	<!-- CSS ///////////////////////////////////////////////////////// -->
-	
+
 	<link rel="stylesheet" href="css/@@buildTarget.css" />
 
 
@@ -129,10 +129,10 @@
 	<!-- SHADERS /////////////////////////////////////////////////// -->
 
 	<script type="x-shader/x-fragment" data-shader="fragment">
-		@@include('../shaders/shader.frag')
+		@@include('../shaders/shader.frag.glsl')
 	</script>
 	<script type="x-shader/x-vertex" data-shader="vertex">
-		@@include('../shaders/shader.vert')
+		@@include('../shaders/shader.vert.glsl')
 	</script>
 
 	<!-- SCRIPTS /////////////////////////////////////////////////////
@@ -140,10 +140,10 @@
 	providing we have a local fallback in place
 	-->
 
-	<!-- 
+	<!--
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
 	<script>window.THREE || document.write('<script src="js/vendor/three-113.min.js"><\/script>')</script> 
-	
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script>
 	<script>window.TweenMax || document.write('<script src="js/vendor/tweenmax-2.1.3.min.js"><\/script>')</script>
 

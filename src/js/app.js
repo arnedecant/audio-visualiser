@@ -11,15 +11,15 @@ import { getFrequencyRangeValue } from './utilities/audio.js'
 
 class App {
 
-	constructor() {
+	constructor () {
 
 		this.url = new URL(window.location.href)
 		this.debug = this.url.searchParams.get('debug') || 0
 
 		// elements
 
-        this.$container = document.getElementById('canvas')
-        this.$video = document.getElementById('video')
+		this.$container = document.getElementById('canvas')
+		this.$video = document.getElementById('video')
 
 		this.$tempCanvas = document.createElement('canvas')
 		this.ctx = this.$tempCanvas.getContext('2d')
@@ -79,7 +79,7 @@ class App {
 
 	}
 
-	setup() {
+	setup () {
 
 		this.audioListener = new THREE.AudioListener()
 
@@ -88,7 +88,7 @@ class App {
 
 	}
 
-	clear() {
+	clear () {
 
 		ENGINE.clear()
 		ENGINE.scene.background = new THREE.Color(0x222222)
@@ -98,7 +98,7 @@ class App {
 
 	}
 
-	reset() {
+	reset () {
 
 		this.clear()
 
@@ -125,16 +125,14 @@ class App {
 
 	}
 
-	init() {
-
+	init () {
 		this.clear()
 		this.initAudio()
 		this.initUserMedia()
 		this.render()
-
 	}
 
-	click(e) {
+	click (e) {
 
 		if (e.target.nodeName !== 'CANVAS') return
 
@@ -151,7 +149,7 @@ class App {
 
 	}
 
-	initAudio() {
+	initAudio () {
 
 		this.audioListener = new THREE.AudioListener()
 		this.audio = new THREE.Audio(this.audioListener)
@@ -168,7 +166,7 @@ class App {
 
 	}
 
-	async initUserMedia() {
+	async initUserMedia () {
 
 		if (this.stream) {
 			this.$video.srcObject = this.stream
@@ -185,18 +183,18 @@ class App {
 
 	}
 
-	getImageData(image = this.$video, useCache = false) {
+	getImageData (image = this.$video, useCache = false) {
 
 		if (useCache && this.cache.image) return this.cache.image
 
 		const w = image.videoWidth
 		const h = image.videoHeight
-		
+
 		if (!w || !h) return null
-		
+
 		this.$tempCanvas.width = w
 		this.$tempCanvas.height = h
-		
+
 		// Reverse image like a mirror
 
 		this.ctx.translate(w, 0)
@@ -213,10 +211,10 @@ class App {
 
 	}
 
-	createParticles() {
+	createParticles () {
 
 		if (!this.indices) return
-		
+
 		const imageData = this.getImageData()
 
 		// if (!imageData) setTimeout(() => this.createParticles(), 100)
@@ -252,16 +250,16 @@ class App {
 				const vX = x - imageData.width / 2  	// Shift in X direction since origin is center of screen
 				const vY = -y + imageData.height / 2 	// Shift in Y direction in the same way (you need -y)
 				const vZ = gray < 300 ? gray : 10000
-				
+
 				vertices.push(vX, vY, vZ)
 
 				let color = hexToRgb('#555555')
-				
+
 				if (this.components.interface.settings.theme == 'discodip') {
 					color = hexToRgb(colorsPerFace[Math.floor(Math.random() * colorsPerFace.length)])
 				}
-				
-            	colors.push(color.r, color.g, color.b)
+
+	     	colors.push(color.r, color.g, color.b)
 
 			}
 		}
@@ -270,7 +268,7 @@ class App {
 
 		vertices = new Float32Array(vertices)
 		geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
-	
+
 		colors = new Float32Array(colors)
 		geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 
@@ -279,12 +277,12 @@ class App {
 
 	}
 
-	render(timestamp) {
+	render (timestamp) {
 
         // render ENGINE
 
 		ENGINE.render()
-		
+
 		// Do stuff
 
 		const useCache = timestamp % 2 === 0 
@@ -297,9 +295,9 @@ class App {
 
 	}
 
-	draw(imageData) {
+	draw (imageData) {
 
-        if (!this.particles || !this.particles.geometry) return
+    if (!this.particles || !this.particles.geometry) return
 
 		this.uniforms.time.value += 0.5
 
@@ -316,7 +314,7 @@ class App {
 
 			// this.analyser.getFrequencyData() would be an array with a size of half of fftSize.
 			const data = this.analyser.getFrequencyData()
-			
+
 			const bass = getFrequencyRangeValue(data, this.frequencyRange.bass)
 			const mid = getFrequencyRangeValue(data, this.frequencyRange.mid)
 			const treble = getFrequencyRangeValue(data, this.frequencyRange.treble)
@@ -327,32 +325,28 @@ class App {
 
 		let count = 0
 
-        // Loop and update particles
-        
-        const positions = this.particles.geometry.attributes.position.array
+		// Loop and update particles
+
+		const positions = this.particles.geometry.attributes.position.array
 
 		for (let i = 0; i < positions.length; i += 3) {
 
 			// Take an average of RGB and make it a gray value.
-			
+
 			let index = this.indices[count]
 			let gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3
 			let render = ((this.uniforms.isWebcam.value) || (i % skip === 0))
-			
-            if (gray < threshold && render) {
 
+			if (gray < threshold && render) {
 				if (gray < threshold / 3) {
-                    positions[i + 2] = gray * rgb.r * multiplier
-                } else if (gray < threshold / 2) {
-                   positions[i + 2] = gray * rgb.g * multiplier
-                } else {
-                    positions[i + 2] = gray * rgb.b * multiplier
-                }
-                
-            } else {
-
-                positions[i + 2] = 10000
-                
+					positions[i + 2] = gray * rgb.r * multiplier
+				} else if (gray < threshold / 2) {
+					positions[i + 2] = gray * rgb.g * multiplier
+				} else {
+					positions[i + 2] = gray * rgb.b * multiplier
+				}
+			} else {
+				positions[i + 2] = 10000
 			}
 
 			count++
@@ -361,7 +355,7 @@ class App {
 
 		this.uniforms.size.value = (rgb.r + rgb.g + rgb.b) / 3 * 35 + 5
 		this.particles.geometry.attributes.position.needsUpdate = true
-        
+
 	}
 
 }

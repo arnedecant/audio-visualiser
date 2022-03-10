@@ -29,7 +29,7 @@ export const clamp = (value, min, max) => {
 
 	if (value < min) return min
 	if (value > max) return max
-	
+
 	return value
 
 }
@@ -37,7 +37,7 @@ export const clamp = (value, min, max) => {
 export const lerp = (v0, v1, t) => {
 
 	return v0 * (1 - t) + v1 * t
-	
+
 }
 
 export const safeEval = (exp) => {
@@ -49,7 +49,7 @@ export const safeEval = (exp) => {
 	// regular expression
 
 	var reg = /(?:[a-z$_][a-z0-9$_]*)|(?:[;={}\[\]"'!&<>^\\?:])/ig,
-	valid = true;
+		valid = true;
 
 	// detect valid JS identifier names and replace them
 
@@ -67,9 +67,9 @@ export const safeEval = (exp) => {
 
 	if (!valid) alert('Invalid arithmetic expression')
 
-	try { 
+	try {
 		return eval(exp)
-	} catch (e) { 
+	} catch (e) {
 		alert('Invalid arithmetic expression');
 	}
 

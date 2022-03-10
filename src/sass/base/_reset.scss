@@ -1,31 +1,38 @@
-html, body {
+html,
+body {
 	margin: 0;
 	width: 100%;
 	height: 100vh;
 	overflow: hidden;
 }
 
-ul, li {
+ul,
+li {
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
 }
 
-button, a {
+button,
+a {
 	all: unset;
 	pointer-events: all;
 	cursor: pointer;
 }
 
-button *, a * {
+button *,
+a * {
 	pointer-events: none;
 }
 
-input, textarea {
+input,
+textarea {
 	all: unset;
 	pointer-events: all;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
 	box-sizing: border-box;
 }

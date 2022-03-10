@@ -4,7 +4,7 @@
 
 export default class Audio {
 
-	constructor(options = {}) {
+	constructor (options = {}) {
 
 		this.name = options.name
 		this.context = options.context || GAME.audioContext
@@ -26,17 +26,17 @@ export default class Audio {
 
 		const codecs = ['mp3', 'ogg', 'xmp']
 		let codec = codecs.find((c) => Audio.supportsAudioType(c))
-		
+
 		if (codec) {
 			this.path = `assets/audio/${ this.name }.${ codec }`
-            this.load(this.path)
+      this.load(this.path)
 		} else {
 			console.warn("Browser does not support any of the supplied audio files")
-        }
-        
+    }
+
 	}
-	
-	static supportsAudioType(type) {
+
+	static supportsAudioType (type) {
 
 		let audio
 		let formats = {
@@ -48,86 +48,85 @@ export default class Audio {
 
 		if (!audio) audio = document.createElement('audio')
 
-        return audio.canPlayType(formats[type] || type)
-        
+		return audio.canPlayType(formats[type] || type)
+
 	}
-	
-	load(path) {
-          
-        const _this = this
-        const request = new XMLHttpRequest() // load buffer asynchronously
-          
-  		request.open("GET", path, true)
-  		request.responseType = 'arraybuffer'
 
-  		request.onload = () => {
+	load (path) {
 
-            // Asynchronously decode the audio file data in request.response
+		const _this = this
+		const request = new XMLHttpRequest() // load buffer asynchronously
 
-            let fnError = (error) => console.error('decodeAudioData error', error)
-            let fnBuffer = (buffer) => {
+		request.open("GET", path, true)
+		request.responseType = 'arraybuffer'
 
-                if (!buffer) {
-                    console.error('error decoding file data: ' + _this.path)
-                    return
-                }
-                
-                _this.buffer = buffer
-                if (_this.autoplay) _this.play()
+		request.onload = () => {
 
-            }
-            
-            _this.context.decodeAudioData(request.response, fnBuffer, fnError)
-            
-  		}
+			// Asynchronously decode the audio file data in request.response
 
-  		request.onerror = () => console.error('Audio Loader: XHR error')
-        request.send()
-          
+			let fnError = (error) => console.error('decodeAudioData error', error)
+			let fnBuffer = (buffer) => {
+
+				if (!buffer) {
+					console.error('error decoding file data: ' + _this.path)
+					return
+				}
+
+				_this.buffer = buffer
+				if (_this.autoplay) _this.play()
+
+			}
+
+			_this.context.decodeAudioData(request.response, fnBuffer, fnError)
+
+		}
+
+		request.onerror = () => console.error('Audio Loader: XHR error')
+		request.send()
+
 	}
-	
-	set loop(value) {
+
+	set loop (value) {
 
 		this._loop = value
-        if (this.source != undefined) this.source.loop = value
-        
+		if (this.source != undefined) this.source.loop = value
+
 	}
-	
-	play(volume) {
+
+	play (volume) {
 
 		if (volume) this.volume = volume
 
 		if (this.buffer == null) return
-        if (this.source != undefined) this.source.stop()
-        
+		if (this.source != undefined) this.source.stop()
+
 		this.source = this.context.createBufferSource()
 		this.source.loop = this._loop
-	  	this.source.buffer = this.buffer
-	  	this.source.connect(this.gainNode)
-        this.source.start(0)
-        
+		this.source.buffer = this.buffer
+		this.source.connect(this.gainNode)
+		this.source.start(0)
+
 	}
-	
-	set volume(value) {
+
+	set volume (value) {
 
 		this._volume = value
-        this.gainNode.gain.setTargetAtTime(value, this.context.currentTime + this.fadeDuration, 0)
-        
+		this.gainNode.gain.setTargetAtTime(value, this.context.currentTime + this.fadeDuration, 0)
+
 	}
-	
-	pause() {
+
+	pause () {
 
 		if (this.source == undefined) return
-        this.source.stop()
-        
-	}
-	
-	stop() {
-
-        if (this.source == undefined) return
-        
 		this.source.stop()
-        delete this.source
-        
+
+	}
+
+	stop () {
+
+    if (this.source == undefined) return
+		this.source.stop()
+    delete this.source
+
 	}
 }

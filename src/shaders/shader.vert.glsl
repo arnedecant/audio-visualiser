@@ -25,7 +25,7 @@ varying vec3 vColor;
 //     // gl_PointSize = size + ((sin(time * 0.05) + 1.0) / 2.0) * 10.0;
 //     gl_PointSize = size;
 //     gl_Position = projectionMatrix * mvPosition;
-    
+
 // }
 
 void main() {
@@ -39,5 +39,5 @@ void main() {
     // gl_PointSize = size + ((sin(time * 0.05) + 1.0) / 2.0) * 10.0;
     gl_PointSize = size;
     gl_Position = projectionMatrix * mvPosition;
-    
+
 }

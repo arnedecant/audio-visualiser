@@ -5,7 +5,7 @@
 import Component from '../base/component'
 import Dispatcher from '../helpers/dispatcher'
 
-export default class Interface extends Component { 
+export default class Interface extends Component {
 
 	constructor (selector) {
 

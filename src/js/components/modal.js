@@ -7,12 +7,12 @@ import Dispatcher from '../helpers/dispatcher'
 
 // extends Component ??
 
-export default class Modal { 
+export default class Modal {
 
-	constructor(id, triggers = []) {
+	constructor (id, triggers = []) {
 
 		// Properties
-		
+
 		this.id = `modal__${ id }`
 		this.element = document.getElementById(this.id)
 		this.triggers = this._normalize(triggers)
@@ -31,7 +31,7 @@ export default class Modal {
 
 	// Convert whatever type triggers may be into an array of nodes
 
-	_normalize(triggers) {
+	_normalize (triggers) {
 
 		// String
 
@@ -43,26 +43,26 @@ export default class Modal {
 		triggers.map((trigger) => typeof trigger === 'string' ? [...document.querySelectorAll(trigger)] : trigger)
 
 		// Flatten the array
-		
+
 		return triggers.flat()
 
 	}
 
-	_isSupported() {
+	_isSupported () {
 
 		if (typeof this.element.showModal === 'function') return true
-		
+
 		return false
 
 	}
 
-	init() {
+	init () {
 
-		
+
 
 	}
 
-	click(e) {
+	click (e) {
 
 		if (e.target.nodeName !== 'BUTTON') return
 
@@ -70,17 +70,17 @@ export default class Modal {
 		this.onClick.notify()
 
     }
-    
-    open() {
+
+    open () {
 
 		if (this._isSupported()) this.element.showModal()
 		else this.element.setAttribute('open', 'open')
-		
+
 		this.onOpen.notify()
 
     }
 
-    close() {
+    close () {
 
 		if (this._isSupported()) this.element.close()
 		else this.element.removeAttribute('open')

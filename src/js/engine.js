@@ -8,13 +8,13 @@ import Preloader from "./helpers/preloader"
 
 export default class Engine {
 
-	constructor({ container = document.body, size = 1, background = null, debug = false, assetsPath = null }) {
+	constructor ({ container = document.body, size = 1, background = null, debug = false, assetsPath = null }) {
 
 		// set properties
 
 		this.config = { container, size, background, debug, assetsPath }
 		// this.config = arguments[0]
-		
+
 		this.mouse = window.MOUSE = new THREE.Vector2()
 		this.raycaster = new THREE.Raycaster()
 		this.container = container
@@ -27,7 +27,7 @@ export default class Engine {
 
 	}
 
-	init() {
+	init () {
 
 		// set up scene, camera and renderer
 
@@ -54,7 +54,7 @@ export default class Engine {
 
 	}
 
-	createScene() {
+	createScene () {
 
 		// create new scene
 
@@ -86,7 +86,7 @@ export default class Engine {
 
 	}
 
-	debug() {
+	debug () {
 
 		let axes = new THREE.AxesHelper(50)
 		let grid = new THREE.GridHelper(2000, 40, 0x000000, 0x000000)
@@ -96,13 +96,13 @@ export default class Engine {
 
 		this.scene.add(axes)
 		this.scene.add(grid)
-		
+
 		this.stats = new Stats()
 		this.container.appendChild(this.stats.dom)
 
 	}
 
-	createCamera() {
+	createCamera () {
 
 		// set values to init the camera
 
@@ -130,7 +130,7 @@ export default class Engine {
 
 	}
 
-	createRenderer() {
+	createRenderer () {
 
 		// create new renderer
 
@@ -141,7 +141,7 @@ export default class Engine {
 
 		// set the size
 
-		this.resize()
+		this.resize ()
 
 		// enable shadowMap
 
@@ -161,7 +161,7 @@ export default class Engine {
 
 	}
 
-	createLights() {
+	createLights () {
 
 		// create a new ambient light
 
@@ -173,7 +173,7 @@ export default class Engine {
 
 	}
 
-	setSize() {
+	setSize () {
 
 		// set initial width and height
 
@@ -191,7 +191,7 @@ export default class Engine {
 
 	}
 
-	resize(e) {
+	resize (e) {
 
 		// set canvas dimensions
 
@@ -209,7 +209,7 @@ export default class Engine {
 
 	}
 
-	mousemove(e) {
+	mousemove (e) {
 
 		e.preventDefault()
 
@@ -224,9 +224,13 @@ export default class Engine {
 	}
 
 
-	add(mesh) { this.scene.add(mesh) }
+	add (mesh) {
 
-	remove(mesh) { 
+		this.scene.add(mesh)
+
+	}
+
+	remove (mesh) {
 
 		// if (!(mesh instanceof THREE.Mesh)) return
 
@@ -239,7 +243,7 @@ export default class Engine {
 
 	}
 
-	clear(obj = this.scene) {
+	clear (obj = this.scene) {
 
 		if (obj instanceof THREE.Mesh) {
 
@@ -247,8 +251,8 @@ export default class Engine {
 
 		} else {
 
-			if (obj.children == undefined) return 
-			
+			if (obj.children == undefined) return
+
 			while (obj.children.length > 0) {
 				this.clear(obj.children[0])
 				obj.remove(obj.children[0])
@@ -258,7 +262,7 @@ export default class Engine {
 
 	}
 
-	load(path, fn) {
+	load (path, fn) {
 
 		let loader = this.loader
 
@@ -268,7 +272,7 @@ export default class Engine {
 
 	}
 
-	render(dt) {
+	render (dt) {
 
 		if (this.controls) this.controls.update()
 		if (this.stats) this.stats.update()
