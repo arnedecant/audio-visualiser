@@ -225,12 +225,13 @@ class App {
 
 	initPlane () {
 
-		const geometry = new THREE.PlaneGeometry(this.$video.videoWidth, this.$video.videoHeight)
-		const material = new THREE.MeshLambertMaterial()
+		const geometry = new THREE.PlaneGeometry(this.$video.videoWidth / 2, this.$video.videoHeight / 2)
+		const texture = new THREE.VideoTexture(this.$video)
+		const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide })
 		const mesh = new THREE.Mesh(geometry, material)
 
-		mesh.position.z = -100
-		mesh.rotation.x = -Math.PI / 2
+		mesh.position.z = 0
+		mesh.scale.x = -1
 
 		ENGINE.add(mesh)
 

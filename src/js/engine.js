@@ -234,11 +234,17 @@ export default class Engine {
 
 		// if (!(mesh instanceof THREE.Mesh)) return
 
-		mesh.geometry.dispose()
-		mesh.geometry = null
-		mesh.material.dispose()
-		mesh.material = null
-		mesh.dispose()
+		if (mesh.geometry) {
+			mesh.geometry.dispose()
+			mesh.geometry = null
+		}
+
+		if (mesh.material) {
+			mesh.material.dispose()
+			mesh.material = null
+		}
+
+		if (mesh.dispose) mesh.dispose()
 		mesh = null
 
 	}
