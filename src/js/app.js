@@ -68,7 +68,7 @@ class App {
 		// events
 
 		document.body.addEventListener('click', this.click.bind(this))
-		this.$video.addEventListener('loadeddata', this.createParticles.bind(this))
+		this.$video.addEventListener('loadeddata', this.onVideoLoaded.bind(this))
 
 		this.modals.privacy.onClose.addListener(this.init.bind(this))
 		this.components.interface.onClick.addListener(this.reset.bind(this))
@@ -211,7 +211,32 @@ class App {
 
 	}
 
-	createParticles () {
+	onVideoLoaded (e) {
+
+		ENGINE.clear()
+
+		if (this.components.interface.settings.filter === 'particles') {
+			this.initParticles()
+		} else if (this.components.interface.settings.filter === 'none') {
+			this.initPlane()
+		}
+
+	}
+
+	initPlane () {
+
+		const geometry = new THREE.PlaneGeometry(this.$video.videoWidth, this.$video.videoHeight)
+		const material = new THREE.MeshLambertMaterial()
+		const mesh = new THREE.Mesh(geometry, material)
+
+		mesh.position.z = -100
+		mesh.rotation.x = -Math.PI / 2
+
+		ENGINE.add(mesh)
+
+	}
+
+	initParticles () {
 
 		if (!this.indices) return
 

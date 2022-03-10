@@ -12,7 +12,8 @@ export default class Interface extends Component {
 		super(selector)
 
 		this.settings = {
-			theme: 'grayscale',
+			filter: 'particles',
+			theme: 'discodip',
 			video: 'webcam',
 			state: 1
 		}
