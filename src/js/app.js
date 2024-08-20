@@ -41,8 +41,16 @@ class App {
 		}
 
 		this.shaders = {
-			vertex: document.querySelector('[data-shader="vertex"]').textContent,
-			fragment: document.querySelector('[data-shader="fragment"]').textContent
+			particles: {
+				vertex: document.querySelector('.shader--particles[data-shader="vertex"]').textContent,
+				fragment: document.querySelector('.shader--particles[data-shader="fragment"]').textContent
+			},
+			cthulhu: {
+				vertex: document.querySelector('.shader--cthulhu[data-shader="vertex"]').textContent,
+				fragment: document.querySelector('.shader--cthulhu[data-shader="fragment"]').textContent
+			},
+			azathoth: {},
+			nyarlathotep: {}
 		}
 
 		this.fftSize = 2048
@@ -139,13 +147,20 @@ class App {
 		if (this.audioListener) this.audioListener.context.resume()
 		if (!this.audio) return
 
-		if (this.audio.isPlaying) {
-			this.audio.pause()
-			setTimeout(() => this.uniforms.isPlaying.value = false, 200)
-		} else {
+		if (!this.audio.isPlaying) {
 			this.audio.play()
 			this.uniforms.isPlaying.value = true
 		}
+
+		// if (this.audio.isPlaying) {
+		// 	this.audio.pause()
+		// 	e.target.dataset.state = 'pause'
+		// 	setTimeout(() => this.uniforms.isPlaying.value = false, 200)
+		// } else {
+		// 	this.audio.play()
+		// 	e.target.dataset.state = 'play'
+		// 	this.uniforms.isPlaying.value = true
+		// }
 
 	}
 
@@ -217,7 +232,9 @@ class App {
 
 		if (this.components.interface.settings.filter === 'particles') {
 			this.initParticles()
-		} else if (this.components.interface.settings.filter === 'none') {
+		} else if (this.components.interface.settings.filter === 'cthulhu') {
+			this.initCthulhu()
+		} else {
 			this.initPlane()
 		}
 
@@ -232,7 +249,24 @@ class App {
 
 		mesh.position.z = 0
 		mesh.scale.x = -1
+		ENGINE.add(mesh)
 
+	}
+
+	initCthulhu () {
+
+		const geometry = new THREE.PlaneGeometry(this.$video.videoWidth / 2, this.$video.videoHeight / 2)
+		const material = new THREE.ShaderMaterial({
+			uniforms: {
+				// video: { type: 't', value: this.$video }
+			},
+			vertexShader: this.shaders.cthulhu.vertex,
+			fragmentShader: this.shaders.cthulhu.fragment,
+		})
+		const mesh = new THREE.Mesh(geometry, material)
+
+		mesh.position.z = 0
+		mesh.scale.x = -1
 		ENGINE.add(mesh)
 
 	}
@@ -248,8 +282,8 @@ class App {
 		const geometry = new THREE.BufferGeometry()
 		const material = new THREE.ShaderMaterial({
 			uniforms: this.uniforms,
-			vertexShader: this.shaders.vertex,
-			fragmentShader: this.shaders.fragment,
+			vertexShader: this.shaders.particles.vertex,
+			fragmentShader: this.shaders.particles.fragment,
 			transparent: true,
 			depthWrite: false,
 			blending: THREE.AdditiveBlending

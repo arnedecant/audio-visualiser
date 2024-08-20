@@ -128,12 +128,20 @@
 
 	<!-- SHADERS /////////////////////////////////////////////////// -->
 
-	<script type="x-shader/x-fragment" data-shader="fragment">
-		@@include('../shaders/shader.frag.glsl')
+	<script type="x-shader/x-fragment" class="shader--particles" data-shader="fragment">
+		@@include('../shaders/particles/shader.frag.glsl')
 	</script>
-	<script type="x-shader/x-vertex" data-shader="vertex">
-		@@include('../shaders/shader.vert.glsl')
+	<script type="x-shader/x-vertex" class="shader--particles" data-shader="vertex">
+		@@include('../shaders/particles/shader.vert.glsl')
 	</script>
+
+	<script type="x-shader/x-fragment" class="shader--cthulhu" data-shader="fragment">
+		@@include('../shaders/cthulhu/shader.frag.glsl')
+	</script>
+	<script type="x-shader/x-vertex" class="shader--cthulhu" data-shader="vertex">
+		@@include('../shaders/cthulhu/shader.vert.glsl')
+	</script>
+
 
 	<!-- SCRIPTS /////////////////////////////////////////////////////
 	For 3rd party libraries we're better off using a CDN,
