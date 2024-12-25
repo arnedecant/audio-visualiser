@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, onBeforeUnmount, ref } from 'vue'
+import { computed, watch, ref } from 'vue'
 import { useUsermediaStore } from '@/stores/usermedia'
 import { VideoTexture } from 'three'
 
