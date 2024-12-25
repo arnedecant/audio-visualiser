@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { TresCanvas } from '@tresjs/core'
-
-const onClick = () => console.log('click')
+import { OrbitControls } from '@tresjs/cientos'
+import UsermediaPlane from './UsermediaPlane.vue'
 </script>
 
 <template>
-  <TresCanvas window-size>
-    <TresPerspectiveCamera />
-    <TresMesh @click="onClick">
-      <TresBoxGeometry :args="[1, 1, 1]" />
-      <TresMeshNormalMaterial />
-    </TresMesh>
+  <TresCanvas windowSize powerPreference="high-performance" class="canvas">
+    <OrbitControls />
+    <TresPerspectiveCamera visible :position="[0, 1, 0]" />
+    <UsermediaPlane />
   </TresCanvas>
 </template>
 
-<style scoped></style>
+<style scoped>
+.canvas {
+  background-color: var(--color-background);
+}
+</style>

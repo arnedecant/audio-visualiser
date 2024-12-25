@@ -10,5 +10,10 @@
     {
       "path": "./tsconfig.vitest.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "types": ["node", "vite/client"]
+  }
 }

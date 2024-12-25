@@ -8,6 +8,9 @@ import { templateCompilerOptions } from '@tresjs/core'
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    target: 'ESNext',
+  },
   plugins: [
     vue({
       ...templateCompilerOptions,
