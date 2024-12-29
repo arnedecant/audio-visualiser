@@ -9,8 +9,7 @@ import Particles from './Particles.vue'
   <TresCanvas windowSize powerPreference="high-performance" class="canvas">
     <OrbitControls />
     <TresPerspectiveCamera visible :position="[0, 1, 0]" />
-    <UsermediaPlane v-if="false" />
-    <Particles />
+    <UsermediaPlane />
   </TresCanvas>
 </template>
 

@@ -7,6 +7,9 @@ export const useUsermediaStore = defineStore('usermedia', () => {
   const status = ref(UsermediaStatus.Unknown)
   const streamDimensions = ref<[number, number]>([0, 0])
   const currentVideo = ref<HTMLVideoElement | null>(null)
+  const hiddenCanvas = document.createElement('canvas')
+  const hiddenCanvasCtx = hiddenCanvas.getContext('2d')
+  const currentVideoFrame = ref<ImageData | null>(null)
 
   const requestStream = async (
     constraints: MediaStreamConstraints = { video: true, audio: false },
@@ -28,6 +31,19 @@ export const useUsermediaStore = defineStore('usermedia', () => {
     currentVideo.value = elVideo
   }
 
+  const getVideoFrameData = () => {
+    if (!currentVideo.value || !hiddenCanvasCtx) return null
+    const w = currentVideo.value.videoWidth
+    const h = currentVideo.value.videoHeight
+    hiddenCanvas.width = w
+    hiddenCanvas.height = h
+    hiddenCanvasCtx.translate(w, 0)
+    hiddenCanvasCtx.scale(-1, 1)
+    hiddenCanvasCtx.drawImage(currentVideo.value, 0, 0)
+    currentVideoFrame.value = hiddenCanvasCtx.getImageData(0, 0, w, h)
+    return currentVideoFrame.value
+  }
+
   return {
     userStream,
     requestStream,
@@ -36,5 +52,7 @@ export const useUsermediaStore = defineStore('usermedia', () => {
     setStreamDimensions,
     setCurrentVideo,
     currentVideo,
+    getVideoFrameData,
+    currentVideoFrame,
   }
 })
