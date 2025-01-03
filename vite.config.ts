@@ -14,6 +14,16 @@ export default defineConfig({
   plugins: [
     vue({
       ...templateCompilerOptions,
+      template: {
+        transformAssetUrls: {
+          video: ['src', 'poster'],
+          source: ['src'],
+          img: ['src'],
+          image: ['xlink:href', 'href'],
+          use: ['xlink:href', 'href'],
+          audio: ['src'],
+        },
+      },
     }),
     glsl(),
     vueJsx(),

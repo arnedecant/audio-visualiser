@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { useUsermediaStore } from '@/stores/usermedia'
-import { UsermediaStatus, VisualiserPreset, VisualiserTheme } from '@/types'
-import { onMounted, computed, ref } from 'vue'
+import { UsermediaStatus } from '@/types'
+import { onMounted, computed } from 'vue'
 import UsermediaPreview from './UsermediaPreview.vue'
+import AudioPreview from './AudioPreview.vue'
+import { useConfigurationStore } from '@/stores/configuration'
+import { storeToRefs } from 'pinia'
 
 const usermedia = useUsermediaStore()
-const presets = Object.values(VisualiserPreset)
-const themes = Object.values(VisualiserTheme)
+const configuration = useConfigurationStore()
+const { isPreviewVisible, presets, themes, currentPreset, currentTheme } =
+  storeToRefs(configuration)
+
 const userStream = computed(() => usermedia.userStream)
 const usermediaStatus = computed(() => usermedia.status)
-const isPreviewVisible = ref(true)
 
 onMounted(() => usermedia.requestStream())
 </script>
@@ -24,14 +28,15 @@ onMounted(() => usermedia.requestStream())
       <label for="preview">Preview</label>
       <input type="checkbox" id="preview" v-model="isPreviewVisible" />
       <label for="preset">Preset</label>
-      <select id="preset">
+      <select id="preset" v-model="currentPreset">
         <option v-for="option of presets" :key="option" :value="option">{{ option }}</option>
       </select>
       <label for="theme">Theme</label>
-      <select id="theme">
+      <select id="theme" v-model="currentTheme">
         <option v-for="option of themes" :key="option" :value="option">{{ option }}</option>
       </select>
     </form>
+    <AudioPreview />
   </section>
 </template>
 

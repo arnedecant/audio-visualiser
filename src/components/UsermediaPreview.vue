@@ -18,7 +18,7 @@ onMounted(() => {
 const onVideoLoaded = () => {
   if (!elVideo.value) return
   usermedia.setStreamDimensions(elVideo.value.videoWidth, elVideo.value.videoHeight)
-  usermedia.setCurrentVideo(elVideo.value)
+  usermedia.setCurrentVideoElement(elVideo.value)
 }
 </script>
 

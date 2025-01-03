@@ -8,7 +8,7 @@ export const useUsermediaStore = defineStore('usermedia', () => {
   const streamDimensions = ref<[number, number]>([0, 0])
   const currentVideo = ref<HTMLVideoElement | null>(null)
   const hiddenCanvas = document.createElement('canvas')
-  const hiddenCanvasCtx = hiddenCanvas.getContext('2d')
+  const hiddenCanvasCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true })
   const currentVideoFrame = ref<ImageData | null>(null)
 
   const requestStream = async (
@@ -27,12 +27,13 @@ export const useUsermediaStore = defineStore('usermedia', () => {
     streamDimensions.value = [width, height]
   }
 
-  const setCurrentVideo = (elVideo: HTMLVideoElement) => {
+  const setCurrentVideoElement = (elVideo: HTMLVideoElement) => {
     currentVideo.value = elVideo
   }
 
-  const getVideoFrameData = () => {
+  const getVideoFrameData = (useCache: boolean = false) => {
     if (!currentVideo.value || !hiddenCanvasCtx) return null
+    if (useCache && currentVideoFrame.value) return currentVideoFrame.value
     const w = currentVideo.value.videoWidth
     const h = currentVideo.value.videoHeight
     hiddenCanvas.width = w
@@ -50,7 +51,7 @@ export const useUsermediaStore = defineStore('usermedia', () => {
     status,
     streamDimensions,
     setStreamDimensions,
-    setCurrentVideo,
+    setCurrentVideoElement,
     currentVideo,
     getVideoFrameData,
     currentVideoFrame,

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import AudioVisualiser from '@/components/AudioVisualiser.vue'
-import Configuration from '@/components/Configuration.vue'
+import ConfigurationPanel from '@/components/ConfigurationPanel.vue'
 </script>
 
 <template>
   <main>
-    <Configuration class="configuration" />
+    <ConfigurationPanel class="configuration" />
     <AudioVisualiser class="audiovisualiser" />
   </main>
 </template>

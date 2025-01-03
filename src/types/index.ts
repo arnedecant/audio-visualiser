@@ -18,3 +18,9 @@ export interface UsermediaOptions {
   audio: boolean
   video: boolean
 }
+
+export interface RGB {
+  r: number
+  g: number
+  b: number
+}
