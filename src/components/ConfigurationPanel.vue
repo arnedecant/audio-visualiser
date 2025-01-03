@@ -36,20 +36,20 @@ onMounted(() => usermedia.requestStream())
         <option v-for="option of themes" :key="option" :value="option">{{ option }}</option>
       </select>
     </form>
-    <AudioPreview />
   </section>
 </template>
 
 <style scoped>
 section {
   padding: 0.5rem;
-  width: 16rem;
+  width: 12rem;
+  background-color: var(--color-background);
 }
 
 form {
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 0.25rem;
+  grid-template-columns: 2fr 3fr;
+  gap: 0.5rem 0.25rem;
 }
 
 form > :not(label) {

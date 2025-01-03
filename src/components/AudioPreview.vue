@@ -23,12 +23,5 @@ const onClickPlay = () => {
 </script>
 
 <template>
-  <audio ref="elAudio" src="@/assets/two.mp3" controls loop @loadeddata="onAudioLoaded" />
-  <button @click="onClickPlay">{{ isPlaying ? 'Pause' : 'Play' }}</button>
+  <audio ref="elAudio" src="@/assets/audio/two.mp3" controls loop @loadeddata="onAudioLoaded" />
 </template>
-
-<style scoped>
-audio {
-  display: none;
-}
-</style>

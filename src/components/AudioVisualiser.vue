@@ -4,18 +4,21 @@ import { OrbitControls } from '@tresjs/cientos'
 import ParticlesPlane from './ParticlesPlane.vue'
 import { computed } from 'vue'
 import { useUsermediaStore } from '@/stores/usermedia'
+import { Vector3 } from 'three'
 
 const usermedia = useUsermediaStore()
 const isStreamReady = computed(() => !!usermedia.currentVideo)
-// const aspectRatio = computed(() => window.innerWidth / window.innerHeight)
+const cameraPosition = computed<Vector3>(() => {
+  return new Vector3(0, 0, usermedia.streamDimensions[0] * 1.2)
+})
 </script>
 
 <template>
-  <TresCanvas windowSize powerPreference="high-performance" class="canvas" :background="0x222222">
+  <TresCanvas windowSize powerPreference="high-performance" class="canvas" :background="0x000000">
     <OrbitControls />
     <TresPerspectiveCamera
       visible
-      :position="[0, 0, 700]"
+      :position="cameraPosition"
       :lookAt="[0, 0, 0]"
       :fieldOfView="45"
       :nearPlane="0.1"
@@ -25,8 +28,4 @@ const isStreamReady = computed(() => !!usermedia.currentVideo)
   </TresCanvas>
 </template>
 
-<style scoped>
-.canvas {
-  background-color: var(--color-background);
-}
-</style>
+<style scoped></style>
