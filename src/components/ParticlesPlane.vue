@@ -5,7 +5,7 @@ import fragmentShader from '@/shaders/particles/fragment.glsl'
 import vertexShader from '@/shaders/particles/vertex.glsl'
 import { useUsermediaStore } from '@/stores/usermedia'
 import { AdditiveBlending, BufferGeometry, ShaderMaterial, Points } from 'three'
-import { watch } from 'vue'
+import { watch, onMounted } from 'vue'
 import { useLoop, useTresContext } from '@tresjs/core'
 import type { RGB } from '@/types'
 import { useAudioStore } from '@/stores/audio'
@@ -18,7 +18,7 @@ const { scene } = useTresContext()
 const usermedia = useUsermediaStore()
 const audio = useAudioStore()
 const configuration = useConfigurationStore()
-const { currentTheme } = storeToRefs(configuration)
+const { currentTheme, currentPreset } = storeToRefs(configuration)
 const uniforms = {
   time: { type: 'f', value: 0.0 },
   size: { type: 'f', value: 10.0 },
@@ -27,6 +27,7 @@ const uniforms = {
   isWebcam: { type: 'b', value: true },
 }
 
+let particles: Points | null = null
 const geometry = new BufferGeometry()
 const material = new ShaderMaterial({
   uniforms: uniforms,
@@ -36,7 +37,7 @@ const material = new ShaderMaterial({
   depthWrite: false,
   blending: AdditiveBlending,
 })
-let particles: Points | null = null
+
 const { getGeometryData, transformPositions, clearParticles } = useParticles(scene)
 
 const setup = () => {
@@ -67,5 +68,7 @@ onBeforeRender(({ elapsed }) => {
   drawFrameData(frameData)
 })
 
-watch(currentTheme, setup, { immediate: true })
+watch(currentTheme, setup)
+watch(currentPreset, setup)
+onMounted(setup)
 </script>

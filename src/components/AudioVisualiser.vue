@@ -14,7 +14,7 @@ const cameraPosition = computed<Vector3>(() => {
 </script>
 
 <template>
-  <TresCanvas windowSize powerPreference="high-performance" class="canvas" :background="0x000000">
+  <TresCanvas windowSize powerPreference="high-performance" class="canvas">
     <OrbitControls />
     <TresPerspectiveCamera
       visible
@@ -28,4 +28,8 @@ const cameraPosition = computed<Vector3>(() => {
   </TresCanvas>
 </template>
 
-<style scoped></style>
+<style scoped>
+.canvas {
+  background: #000000;
+}
+</style>

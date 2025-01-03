@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import AudioVisualiser from '@/components/AudioVisualiser.vue'
 import ConfigurationPanel from '@/components/ConfigurationPanel.vue'
-import AudioPreview from '@/components/AudioPreview.vue'
+import AudioPlayer from '@/components/AudioPlayer.vue'
 </script>
 
 <template>
   <main>
     <ConfigurationPanel class="configuration-panel" />
     <AudioVisualiser class="audio-visualiser" />
-    <AudioPreview class="audio-preview" />
+    <AudioPlayer class="audio-preview" />
   </main>
 </template>
 

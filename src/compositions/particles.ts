@@ -1,5 +1,6 @@
 import { useConfigurationStore } from '@/stores/configuration'
-import { VisualiserTheme, type RGB } from '@/types'
+import { VISUALISER_THEME_COLORS, type RGB } from '@/types'
+import { getRandomFromArray } from '@/utils/array'
 import { hexToRgb } from '@/utils/color'
 import { storeToRefs } from 'pinia'
 import { BufferAttribute, Points, Scene, type TypedArray } from 'three'
@@ -20,15 +21,7 @@ export const useParticles = (scene: Ref<Scene>) => {
   const getGeometryData = (frameData: ImageData) => {
     const verticesData: number[] = []
     const colorData: number[] = []
-    const colorsPerFace = [
-      '#f0932b',
-      '#eb4d4b',
-      '#6ab04c',
-      '#22a6b3',
-      '#be2edd',
-      '#4834d4',
-      '#130f40',
-    ]
+    const colorsPerFace = VISUALISER_THEME_COLORS[currentTheme.value]
 
     for (let y = 0, height = frameData.height; y < height; y += step) {
       for (let x = 0, width = frameData.width; x < width; x += step) {
@@ -42,11 +35,7 @@ export const useParticles = (scene: Ref<Scene>) => {
         const vZ = gray < 300 ? gray : 10000
         verticesData.push(vX, vY, vZ)
 
-        let color = hexToRgb('#555555')
-        if (currentTheme.value === VisualiserTheme.Discodip) {
-          color = hexToRgb(colorsPerFace[Math.floor(Math.random() * colorsPerFace.length)])
-        }
-
+        const color = hexToRgb(getRandomFromArray(colorsPerFace))
         colorData.push(color.r, color.g, color.b)
       }
     }

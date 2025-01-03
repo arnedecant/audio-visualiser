@@ -3,7 +3,6 @@ import { useUsermediaStore } from '@/stores/usermedia'
 import { UsermediaStatus } from '@/types'
 import { onMounted, computed } from 'vue'
 import UsermediaPreview from './UsermediaPreview.vue'
-import AudioPreview from './AudioPreview.vue'
 import { useConfigurationStore } from '@/stores/configuration'
 import { storeToRefs } from 'pinia'
 
@@ -28,7 +27,7 @@ onMounted(() => usermedia.requestStream())
       <label for="preview">Preview</label>
       <input type="checkbox" id="preview" v-model="isPreviewVisible" />
       <label for="preset">Preset</label>
-      <select id="preset" v-model="currentPreset">
+      <select id="preset" v-model="currentPreset" disabled>
         <option v-for="option of presets" :key="option" :value="option">{{ option }}</option>
       </select>
       <label for="theme">Theme</label>
