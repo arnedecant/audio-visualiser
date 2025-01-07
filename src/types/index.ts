@@ -4,6 +4,7 @@ export enum UsermediaStatus {
   Success = 'success',
   Fail = 'fail',
   Unknown = 'unknown',
+  None = 'none',
 }
 
 export enum VisualiserPreset {

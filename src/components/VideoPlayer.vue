@@ -4,23 +4,29 @@ import { useUsermediaStore } from '@/stores/usermedia'
 import { VisualiserPreset } from '@/types'
 import { computed, watch, useTemplateRef, onMounted } from 'vue'
 
-const props = defineProps<{
-  stream: MediaStream
-}>()
+const props = withDefaults(
+  defineProps<{
+    stream?: MediaStream | null
+    src?: string | null
+  }>(),
+  {
+    stream: null,
+    src: null,
+  },
+)
 
 const elVideo = useTemplateRef<HTMLVideoElement>('elVideo')
 const usermedia = useUsermediaStore()
 const configuration = useConfigurationStore()
 const isWebcam = computed(() => configuration.currentPreset === VisualiserPreset.Webcam)
 
-const setup = (isWebcam: boolean) => {
+const setup = () => {
   if (!elVideo.value) return
-  elVideo.value.srcObject = isWebcam ? props.stream : null
-  usermedia.setStreamDimensions(elVideo.value.videoWidth, elVideo.value.videoHeight)
+  elVideo.value.srcObject = isWebcam.value ? props.stream : null
 }
 
 watch(isWebcam, setup) // { immediate: true } doesn't work
-onMounted(() => setup(isWebcam.value))
+onMounted(setup)
 
 const onVideoLoaded = () => {
   if (!elVideo.value) return
@@ -35,9 +41,10 @@ const onVideoLoaded = () => {
     :class="{ 'is-webcam': isWebcam }"
     autoplay
     muted
+    loop
     @loadeddata="onVideoLoaded"
   >
-    <source src="@/assets/video/jellyfish.mp4" type="video/mp4" v-if="!isWebcam" />
+    <source src="@/assets/video/jellyfish.mp4" type="video/mp4" />
   </video>
 </template>
 

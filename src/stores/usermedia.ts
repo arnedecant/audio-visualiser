@@ -1,6 +1,9 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { UsermediaStatus } from '@/types'
+import { UsermediaStatus, VisualiserPreset } from '@/types'
+import { useConfigurationStore } from './configuration'
+
+const configuration = useConfigurationStore()
 
 export const useUsermediaStore = defineStore('usermedia', () => {
   const userStream = ref<MediaStream | null>(null)
@@ -23,6 +26,13 @@ export const useUsermediaStore = defineStore('usermedia', () => {
     }
   }
 
+  const stopStream = () => {
+    if (!userStream.value) return
+    userStream.value.getTracks().forEach((track) => track.stop())
+    userStream.value = null
+    status.value = UsermediaStatus.None
+  }
+
   const setStreamDimensions = (width: number, height: number) => {
     streamDimensions.value = [width, height]
   }
@@ -36,24 +46,29 @@ export const useUsermediaStore = defineStore('usermedia', () => {
     if (useCache && currentVideoFrame.value) return currentVideoFrame.value
     const w = currentVideo.value.videoWidth
     const h = currentVideo.value.videoHeight
+    setStreamDimensions(w, h)
+    if (w === 0 && h === 0) return currentVideoFrame.value
     hiddenCanvas.width = w
     hiddenCanvas.height = h
-    hiddenCanvasCtx.translate(w, 0)
-    hiddenCanvasCtx.scale(-1, 1)
+    if (configuration.currentPreset === VisualiserPreset.Webcam) {
+      hiddenCanvasCtx.translate(w, 0)
+      hiddenCanvasCtx.scale(-1, 1)
+    }
     hiddenCanvasCtx.drawImage(currentVideo.value, 0, 0)
     currentVideoFrame.value = hiddenCanvasCtx.getImageData(0, 0, w, h)
     return currentVideoFrame.value
   }
 
   return {
-    userStream,
-    requestStream,
-    status,
-    streamDimensions,
-    setStreamDimensions,
-    setCurrentVideoElement,
     currentVideo,
-    getVideoFrameData,
     currentVideoFrame,
+    getVideoFrameData,
+    requestStream,
+    setCurrentVideoElement,
+    setStreamDimensions,
+    status,
+    stopStream,
+    streamDimensions,
+    userStream,
   }
 })

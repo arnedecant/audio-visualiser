@@ -46,32 +46,34 @@ export const useParticles = (scene: Ref<Scene>) => {
     }
   }
 
-  // const drawFrameData = (particles: Points, uniforms: object, frameData: ImageData) => {}
+  const getNewPosition = (base: number, value: number) => {
+    const multiplier = 4
+    return base * value * multiplier
+  }
 
   const transformPositions = (
     positions: TypedArray,
     frameData: ImageData,
     rgb: RGB,
-    isRenderAllowed: boolean = true,
+    isRenderForced: boolean = true,
   ) => {
     // const spread = 2
     const threshold = 300
-    const multiplier = 3
-    const skip = 2
+    const skip = 5
     let count = 0
     for (let i = 0; i < positions.length; i += 3) {
       // Take an average of RGB and make it a gray value.
       const index = indices[count]
       const gray =
         (frameData.data[index] + frameData.data[index + 1] + frameData.data[index + 2]) / 3
-      const shouldRender = isRenderAllowed || i % skip === 0
+      const shouldRender = isRenderForced || i % skip === 0
       if (gray < threshold && shouldRender) {
         if (gray < threshold / 3) {
-          positions[i + 2] = gray * rgb.r * multiplier
+          positions[i + 2] = getNewPosition(gray, rgb.r)
         } else if (gray < threshold / 2) {
-          positions[i + 2] = gray * rgb.g * multiplier
+          positions[i + 2] = getNewPosition(gray, rgb.g)
         } else {
-          positions[i + 2] = gray * rgb.b * multiplier
+          positions[i + 2] = getNewPosition(gray, rgb.b)
         }
       } else {
         positions[i + 2] = 10000

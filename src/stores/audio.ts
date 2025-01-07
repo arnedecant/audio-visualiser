@@ -5,7 +5,7 @@ import { Audio, AudioAnalyser, AudioListener } from 'three'
 import { ref } from 'vue'
 
 export const useAudioStore = defineStore('audio', () => {
-  const el = ref<HTMLAudioElement | null>(null)
+  const elAudio = ref<HTMLAudioElement | null>(null)
   const src = ref<string | null>(null)
   const fftSize = 2048
   const listener = new AudioListener()
@@ -22,7 +22,7 @@ export const useAudioStore = defineStore('audio', () => {
   const analyser = new AudioAnalyser(audio, fftSize)
 
   const setCurrentAudioElement = (newEl: HTMLAudioElement) => {
-    el.value = newEl
+    elAudio.value = newEl
     src.value = newEl.src
     audio.setMediaElementSource(newEl)
   }
@@ -40,5 +40,6 @@ export const useAudioStore = defineStore('audio', () => {
     frequencyRange,
     setCurrentAudioElement,
     getFrequencyRgb,
+    elAudio,
   }
 })
