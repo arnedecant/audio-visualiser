@@ -8,6 +8,7 @@ import glsl from 'vite-plugin-glsl'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/webgl/webcam-audio-visualizer/',
   build: {
     target: 'ESNext',
   },
