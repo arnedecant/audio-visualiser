@@ -5,6 +5,7 @@ import { Audio, AudioAnalyser, AudioListener } from 'three'
 import { ref } from 'vue'
 
 export const useAudioStore = defineStore('audio', () => {
+  const hasUserInteracted = ref(false)
   const elAudio = ref<HTMLAudioElement | null>(null)
   const src = ref<string | null>(null)
   const fftSize = 2048
@@ -35,11 +36,18 @@ export const useAudioStore = defineStore('audio', () => {
     return { r: bass, g: mid, b: treble }
   }
 
+  const setUserInteracted = (newVal: boolean = true) => {
+    hasUserInteracted.value = newVal
+    if (newVal && elAudio.value) elAudio.value.play()
+  }
+
   return {
     analyser,
     frequencyRange,
+    hasUserInteracted,
     setCurrentAudioElement,
     getFrequencyRgb,
+    setUserInteracted,
     elAudio,
   }
 })

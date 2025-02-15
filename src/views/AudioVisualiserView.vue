@@ -4,12 +4,19 @@ import ConfigurationPanel from '@/components/ConfigurationPanel.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import { ref } from 'vue'
 import ModalAbout from '@/components/modals/ModalAbout.vue'
+import { useAudioStore } from '@/stores/audio'
+
+const { setUserInteracted } = useAudioStore()
 
 const isModalVisible = ref(true)
+const onCloseModalAbout = () => {
+  isModalVisible.value = false
+  setUserInteracted(true)
+}
 </script>
 
 <template>
-  <ModalAbout v-if="isModalVisible" @close="isModalVisible = false" />
+  <ModalAbout v-if="isModalVisible" @close="onCloseModalAbout" />
   <main v-else>
     <ConfigurationPanel class="configuration-panel" />
     <AudioVisualiser class="audio-visualiser" />

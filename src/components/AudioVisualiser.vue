@@ -4,7 +4,6 @@ import { OrbitControls } from '@tresjs/cientos'
 import ParticlesPlane from './ParticlesPlane.vue'
 import { computed, ref, watch } from 'vue'
 import { useUsermediaStore } from '@/stores/usermedia'
-import { Vector3 } from 'three'
 import { useConfigurationStore } from '@/stores/configuration'
 import { storeToRefs } from 'pinia'
 import { VisualiserPreset } from '@/types'
@@ -12,7 +11,7 @@ import { VisualiserPreset } from '@/types'
 const usermedia = useUsermediaStore()
 const configuration = useConfigurationStore()
 
-const { streamDimensions, currentVideo, currentVideoFrame } = storeToRefs(usermedia)
+const { currentVideo, currentVideoFrame } = storeToRefs(usermedia)
 const { currentPreset, isCanvasLocked } = storeToRefs(configuration)
 
 const cameraLookAt = ref<[number, number, number]>([0, 0, 0])

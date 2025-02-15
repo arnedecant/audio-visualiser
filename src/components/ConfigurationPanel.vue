@@ -38,14 +38,14 @@ watch(currentPreset, onPresetChange, { immediate: true })
     <p v-if="usermediaStatus === UsermediaStatus.Fail">
       You did not grant permissions to access your webcam.
     </p>
-    <VideoPlayer v-else-if="showVideoPlayer" :stream="userStream" />
+    <VideoPlayer v-else-if="showVideoPlayer" v-show="isPreviewVisible" :stream="userStream" />
     <form>
       <label for="preview">Preview</label>
       <input type="checkbox" id="preview" v-model="isPreviewVisible" />
       <label for="lock">Lock</label>
       <input type="checkbox" id="lock" v-model="isCanvasLocked" />
       <label for="preset">Preset</label>
-      <select id="preset" v-model="currentPreset">
+      <select id="preset" v-model="currentPreset" disabled>
         <option v-for="option of presets" :key="option" :value="option">{{ option }}</option>
       </select>
       <label for="theme">Theme</label>
