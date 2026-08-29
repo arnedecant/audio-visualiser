@@ -8,7 +8,7 @@ import glsl from 'vite-plugin-glsl'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/audio-visualiser/',
   server: {
     port: 9002,
   },

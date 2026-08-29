@@ -61,8 +61,6 @@ The repository workflow deploys pushes to `main` automatically via
 `.github/workflows/deploy.yml`. Enable GitHub Pages for the repository and set
 the Pages build and deployment source to **GitHub Actions**.
 
-The Vite production base path is `/`, so generated asset URLs are root-based.
-That works directly for a custom domain or a user/organization Pages site. A
-repository project site is normally hosted at `/<repository-name>/`; use a
-custom domain or user/organization Pages site if the site must be addressable at
-the root path.
+The Vite production base path is `/audio-visualiser/`, so generated asset URLs
+use `/audio-visualiser/`. The deployed repository Pages site is available at
+<https://arnedecant.github.io/audio-visualiser/>.
