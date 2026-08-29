@@ -57,10 +57,9 @@ npm run lint
 
 ## GitHub Pages
 
-The planned repository workflow will deploy pushes to `main` automatically via
+The repository workflow deploys pushes to `main` automatically via
 `.github/workflows/deploy.yml`. Enable GitHub Pages for the repository and set
-the Pages build and deployment source to **GitHub Actions** when that workflow
-is added.
+the Pages build and deployment source to **GitHub Actions**.
 
 The Vite production base path is `/`, so generated asset URLs are root-based.
 That works directly for a custom domain or a user/organization Pages site. A
