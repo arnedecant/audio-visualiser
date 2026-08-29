@@ -1,45 +1,69 @@
-# audio-visualiser
+# Audio Visualiser
 
-This template should help get you started developing with Vue 3 in Vite.
+Audio Visualiser is a browser-based audio visualizer that turns the bundled
+`two.mp3` track and webcam input into a GPU-rendered particle scene. Additional
+bundled media assets and visualizer presets are implementation resources only;
+they are not currently selectable in the UI, and the preset control is
+disabled.
 
-## Recommended IDE Setup
+## How It Works
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Pinia stores coordinate media, playback, audio analysis, and visualizer
+configuration. The selected audio element is connected to the Web Audio API
+through Three.js `AudioAnalyser`; bass, mid, and treble frequency ranges drive
+the visual response. Webcam input or bundled jellyfish video frames are read
+into pixel data, combined with the frequency values, and passed to a
+TresJS/Three.js particle plane.
+Custom GLSL vertex and fragment shaders render and animate the particles.
 
-## Type Support for `.vue` Imports in TS
+## Requirements
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- Node.js 22 or newer
+- npm
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+Install dependencies with:
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+## Commands
+
+Start the development server at <http://localhost:9002>:
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Create a production build:
 
 ```sh
 npm run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+Preview the production build at <http://localhost:9002>:
+
+```sh
+npm run preview
+```
+
+Run the available checks:
 
 ```sh
 npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
+npm run type-check
 npm run lint
 ```
+
+## GitHub Pages
+
+The planned repository workflow will deploy pushes to `main` automatically via
+`.github/workflows/deploy.yml`. Enable GitHub Pages for the repository and set
+the Pages build and deployment source to **GitHub Actions** when that workflow
+is added.
+
+The Vite production base path is `/`, so generated asset URLs are root-based.
+That works directly for a custom domain or a user/organization Pages site. A
+repository project site is normally hosted at `/<repository-name>/`; use a
+custom domain or user/organization Pages site if the site must be addressable at
+the root path.
