@@ -8,7 +8,13 @@ import glsl from 'vite-plugin-glsl'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/webgl/webcam-audio-visualizer/',
+  base: '/',
+  server: {
+    port: 9002,
+  },
+  preview: {
+    port: 9002,
+  },
   build: {
     target: 'ESNext',
   },
